@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">S&amp;ST</string>
+    <string name="about">"Crop a person figure with DeeplabV3 .tflite model"</string>
+    <string name="tflite_model" translatable="false">TFLite Model:</string>
+    <string name="share_button_alt">Share</string>
+    <string name="save_button_alt">Save</string>
+    <string name="switch_camera">Switch camera</string>
+</resources>

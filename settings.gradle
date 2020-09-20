@@ -1,0 +1,2 @@
+rootProject.name='Segmentation_and_Style_Transfer'
+include ':app'
