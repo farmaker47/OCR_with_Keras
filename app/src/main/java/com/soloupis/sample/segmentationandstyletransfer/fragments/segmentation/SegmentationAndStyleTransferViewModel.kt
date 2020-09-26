@@ -1,4 +1,4 @@
-package com.soloupis.sample.segmentationandstyletransfer.fragments.Segmentation
+package com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -10,4 +10,6 @@ class SegmentationAndStyleTransferViewModel(application: Application) : AndroidV
     init {
 
     }
+
+
 }

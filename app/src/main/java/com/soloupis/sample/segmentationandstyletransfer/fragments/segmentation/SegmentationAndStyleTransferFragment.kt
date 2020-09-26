@@ -1,4 +1,4 @@
-package com.soloupis.sample.segmentationandstyletransfer.fragments.Segmentation
+package com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation
 
 import android.graphics.*
 import android.os.Bundle
@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide
 import com.soloupis.sample.segmentationandstyletransfer.ImageUtils
 import com.soloupis.sample.segmentationandstyletransfer.MainActivity
 import com.soloupis.sample.segmentationandstyletransfer.R
-import com.soloupis.sample.segmentationandstyletransfer.fragments.SegmentationFragmentArgs
+import com.soloupis.sample.segmentationandstyletransfer.databinding.FragmentSelfie2segmentationBinding
 import kotlinx.android.synthetic.main.fragment_selfie2segmentation.*
 import kotlinx.coroutines.*
 import org.tensorflow.lite.support.image.TensorImage
@@ -24,17 +24,18 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import org.koin.android.viewmodel.ext.android.viewModel
 
 /**
  * A simple [Fragment] subclass.
- * Use the [SegmentationFragment.newInstance] factory method to
+ * Use the [SegmentationAndStyleTransferFragment.newInstance] factory method to
  * create an instance of this fragment.
  *
  * This is where we show both the captured input image and the output image
  */
-class SegmentationFragment : Fragment() {
+class SegmentationAndStyleTransferFragment : Fragment() {
 
-    private val args: SegmentationFragmentArgs by navArgs()
+    private val args: SegmentationAndStyleTransferFragmentArgs by navArgs()
     private lateinit var filePath: String
     private var finalBitmap: Bitmap? = null
 
@@ -47,6 +48,11 @@ class SegmentationFragment : Fragment() {
     private lateinit var scaledMaskBitmap: Bitmap
     var startTime: Long = 0L
     var inferenceTime = 0L
+
+    // Koin inject ViewModel
+    private val viewModel: SegmentationAndStyleTransferViewModel by viewModel()
+    // DataBinding
+    private lateinit var binding:FragmentSelfie2segmentationBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +68,12 @@ class SegmentationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_selfie2segmentation, container, false)
+        binding = FragmentSelfie2segmentationBinding.inflate(inflater)
+        binding.lifecycleOwner = this
+        binding.viewModelXml = viewModel
+
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -195,7 +206,7 @@ class SegmentationFragment : Fragment() {
     }
 
     companion object {
-        private const val TAG = "SegmentationFragment"
+        private const val TAG = "SegmentationAndStyleTransferFragment"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 
