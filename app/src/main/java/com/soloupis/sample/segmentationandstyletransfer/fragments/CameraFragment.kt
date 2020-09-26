@@ -1,25 +1,34 @@
 package com.soloupis.sample.segmentationandstyletransfer.fragments
 
+import android.app.Activity.RESULT_OK
+import android.content.Context
+import android.content.Intent
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.util.Size
 import android.view.LayoutInflater
 import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.ImageView
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.soloupis.sample.segmentationandstyletransfer.ImageUtils
 import com.soloupis.sample.segmentationandstyletransfer.MainActivity.Companion.getOutputDirectory
 import com.soloupis.sample.segmentationandstyletransfer.R
+import com.soloupis.sample.segmentationandstyletransfer.databinding.FragmentCameraBinding
 import kotlinx.android.synthetic.main.fragment_camera.*
 import java.io.File
 import java.text.SimpleDateFormat
@@ -41,13 +50,26 @@ class CameraFragment : Fragment() {
     private lateinit var cameraCaptureButton: Button
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
+    private lateinit var binding: FragmentCameraBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_camera, container, false)
+        binding = FragmentCameraBinding.inflate(inflater)
+        binding.lifecycleOwner = this
+
+        binding.galleryButton.setOnClickListener {
+            val intent = Intent()
+            intent.type = "image/*"
+            intent.action = Intent.ACTION_GET_CONTENT
+            startActivityForResult(
+                Intent.createChooser(intent, "Select Picture"),
+                PICK_IMAGE_REQUEST
+            )
+        }
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -156,7 +178,7 @@ class CameraFragment : Fragment() {
 
                     // Save bitmap image
                     val filePath = ImageUtils.saveBitmap(bitmap, photoFile)
-                    Log.i(TAG, filePath)
+                    Log.e(TAG, filePath)
 
                     // Pass the file path to the next screen
                     val action =
@@ -165,6 +187,23 @@ class CameraFragment : Fragment() {
 
                 }
             })
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {
+
+            val filePath: Uri? = data.data
+            if (filePath != null) {
+
+                val action =
+                    CameraFragmentDirections.actionCameraToSelfie2segmentation(
+                        filePath.toString()
+                    )
+                findNavController().navigate(action)
+            }
+        }
     }
 
     /**
@@ -198,6 +237,7 @@ class CameraFragment : Fragment() {
     companion object {
         private const val TAG = "CameraFragment"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+        private const val PICK_IMAGE_REQUEST = 1024
     }
 
 }

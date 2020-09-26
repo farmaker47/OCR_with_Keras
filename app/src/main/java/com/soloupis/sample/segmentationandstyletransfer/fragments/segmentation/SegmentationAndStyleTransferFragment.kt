@@ -1,11 +1,13 @@
 package com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation
 
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.os.SystemClock
-import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
@@ -15,17 +17,13 @@ import com.soloupis.sample.segmentationandstyletransfer.MainActivity
 import com.soloupis.sample.segmentationandstyletransfer.R
 import com.soloupis.sample.segmentationandstyletransfer.databinding.FragmentSelfie2segmentationBinding
 import kotlinx.android.synthetic.main.fragment_selfie2segmentation.*
-import kotlinx.coroutines.*
-import org.tensorflow.lite.support.image.TensorImage
-import org.tensorflow.lite.task.vision.segmenter.ImageSegmenter
-import org.tensorflow.lite.task.vision.segmenter.ImageSegmenter.ImageSegmenterOptions
-import org.tensorflow.lite.task.vision.segmenter.OutputType
-import org.tensorflow.lite.task.vision.segmenter.Segmentation
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.viewmodel.ext.android.viewModel
 import java.io.File
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import org.koin.android.viewmodel.ext.android.viewModel
 
 /**
  * A simple [Fragment] subclass.
@@ -42,8 +40,10 @@ class SegmentationAndStyleTransferFragment : Fragment() {
 
     // Koin inject ViewModel
     private val viewModel: SegmentationAndStyleTransferViewModel by viewModel()
+
     // DataBinding
-    private lateinit var binding:FragmentSelfie2segmentationBinding
+    private lateinit var binding: FragmentSelfie2segmentationBinding
+    private lateinit var photoFile: File
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,20 +69,44 @@ class SegmentationAndStyleTransferFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val photoFile = File(filePath)
+        if (filePath.startsWith("/storage")) {
+            photoFile = File(filePath)
 
-        Glide.with(imageview_input.context)
-            .load(photoFile)
-            .into(imageview_input)
+            Glide.with(imageview_input.context)
+                .load(photoFile)
+                .into(imageview_input)
 
-        val selfieBitmap = BitmapFactory.decodeFile(filePath)
-        lifecycleScope.launch(Dispatchers.Default) {
-            val (outputBitmap, inferenceTime) = viewModel.cropPersonFromPhoto(selfieBitmap)
-            withContext(Dispatchers.Main) {
-                updateUI(outputBitmap, inferenceTime)
-                finalBitmap = outputBitmap
+            val selfieBitmap = BitmapFactory.decodeFile(filePath)
+            lifecycleScope.launch(Dispatchers.Default) {
+                val (outputBitmap, inferenceTime) = viewModel.cropPersonFromPhoto(selfieBitmap)
+                withContext(Dispatchers.Main) {
+                    updateUI(outputBitmap, inferenceTime)
+                    finalBitmap = outputBitmap
+                }
             }
+        } else {
+
+            val bitmap =
+                BitmapFactory.decodeStream(
+                    requireActivity().contentResolver.openInputStream(
+                        filePath.toUri()
+                    )
+                )
+
+            Glide.with(imageview_input.context)
+                .load(bitmap)
+                .into(imageview_input)
+
+            lifecycleScope.launch(Dispatchers.Default) {
+                val (outputBitmap, inferenceTime) = viewModel.cropPersonFromPhoto(bitmap)
+                withContext(Dispatchers.Main) {
+                    updateUI(outputBitmap, inferenceTime)
+                    finalBitmap = outputBitmap
+                }
+            }
+
         }
+
     }
 
     /*private fun cropPersonFromPhoto(bitmap: Bitmap): Pair<Bitmap?, Long> {

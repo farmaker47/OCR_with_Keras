@@ -56,7 +56,9 @@ class PermissionsFragment : Fragment() {
 
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 10
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private val REQUIRED_PERMISSIONS =
+            arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
         fun allPermissionsGranted(context: Context) = REQUIRED_PERMISSIONS.all {
             checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
