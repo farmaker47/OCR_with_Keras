@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="?android:attr/actionBarSize"
-    tools:context="com.soloupis.sample.segmentationandstyletransfer.fragments.SegmentationFragment">
+    tools:context="com.soloupis.sample.segmentationandstyletransfer.fragments.Segmentation.SegmentationFragment">
 
     <ScrollView
         android:layout_width="match_parent"

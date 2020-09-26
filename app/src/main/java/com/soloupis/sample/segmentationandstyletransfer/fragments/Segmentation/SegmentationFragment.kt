@@ -1,4 +1,4 @@
-package com.soloupis.sample.segmentationandstyletransfer.fragments
+package com.soloupis.sample.segmentationandstyletransfer.fragments.Segmentation
 
 import android.graphics.*
 import android.os.Bundle
@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.soloupis.sample.segmentationandstyletransfer.ImageUtils
 import com.soloupis.sample.segmentationandstyletransfer.MainActivity
 import com.soloupis.sample.segmentationandstyletransfer.R
+import com.soloupis.sample.segmentationandstyletransfer.fragments.SegmentationFragmentArgs
 import kotlinx.android.synthetic.main.fragment_selfie2segmentation.*
 import kotlinx.coroutines.*
 import org.tensorflow.lite.support.image.TensorImage
@@ -155,7 +156,7 @@ class SegmentationFragment : Fragment() {
     private fun updateUI(outputBitmap: Bitmap?, inferenceTime: Long) {
         progressbar.visibility = View.GONE
         imageview_output?.setImageBitmap(outputBitmap)
-        inference_info.text = "Inference time: " + inferenceTime.toString() + "ms"
+        inference_info.text = "Total process time: " + inferenceTime.toString() + "ms"
     }
 
     override fun onDestroy() {
