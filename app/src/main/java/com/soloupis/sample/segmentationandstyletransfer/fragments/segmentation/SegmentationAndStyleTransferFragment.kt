@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.soloupis.sample.segmentationandstyletransfer.ImageUtils
@@ -38,16 +39,6 @@ class SegmentationAndStyleTransferFragment : Fragment() {
     private val args: SegmentationAndStyleTransferFragmentArgs by navArgs()
     private lateinit var filePath: String
     private var finalBitmap: Bitmap? = null
-
-    private val parentJob = Job()
-    private val coroutineScope = CoroutineScope(
-        Dispatchers.Default + parentJob
-    )
-
-    private lateinit var imageSegmenter: ImageSegmenter
-    private lateinit var scaledMaskBitmap: Bitmap
-    var startTime: Long = 0L
-    var inferenceTime = 0L
 
     // Koin inject ViewModel
     private val viewModel: SegmentationAndStyleTransferViewModel by viewModel()
@@ -85,8 +76,8 @@ class SegmentationAndStyleTransferFragment : Fragment() {
             .into(imageview_input)
 
         val selfieBitmap = BitmapFactory.decodeFile(filePath)
-        coroutineScope.launch {
-            val (outputBitmap, inferenceTime) = cropPersonFromPhoto(selfieBitmap)
+        lifecycleScope.launch(Dispatchers.Default) {
+            val (outputBitmap, inferenceTime) = viewModel.cropPersonFromPhoto(selfieBitmap)
             withContext(Dispatchers.Main) {
                 updateUI(outputBitmap, inferenceTime)
                 finalBitmap = outputBitmap
@@ -94,7 +85,7 @@ class SegmentationAndStyleTransferFragment : Fragment() {
         }
     }
 
-    private fun cropPersonFromPhoto(bitmap: Bitmap): Pair<Bitmap?, Long> {
+    /*private fun cropPersonFromPhoto(bitmap: Bitmap): Pair<Bitmap?, Long> {
         try {
             // Initialization
             startTime = SystemClock.uptimeMillis()
@@ -162,7 +153,7 @@ class SegmentationAndStyleTransferFragment : Fragment() {
         canvas.drawBitmap(mask, 0f, 0f, paint)
         paint.xfermode = null
         return cropped
-    }
+    }*/
 
     private fun updateUI(outputBitmap: Bitmap?, inferenceTime: Long) {
         progressbar.visibility = View.GONE
@@ -173,7 +164,6 @@ class SegmentationAndStyleTransferFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         // clean up coroutine job
-        parentJob.cancel()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
