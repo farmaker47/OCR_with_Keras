@@ -1,10 +1,15 @@
 package com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation
 
 import android.app.Application
+import android.content.Context
 import android.graphics.*
 import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.vision.segmenter.ImageSegmenter
@@ -12,16 +17,80 @@ import org.tensorflow.lite.task.vision.segmenter.OutputType
 import org.tensorflow.lite.task.vision.segmenter.Segmentation
 import java.io.IOException
 
-class SegmentationAndStyleTransferViewModel(application: Application) : AndroidViewModel(application),
+class SegmentationAndStyleTransferViewModel(application: Application) :
+    AndroidViewModel(application),
     KoinComponent {
 
     private lateinit var imageSegmenter: ImageSegmenter
     private lateinit var scaledMaskBitmap: Bitmap
     var startTime: Long = 0L
     var inferenceTime = 0L
+    lateinit var scaledBitmapObject: Bitmap
+
+    var stylename = String()
+    var seekBarProgress: Float = 0F
+
+    private var _currentList: ArrayList<String> = ArrayList()
+    val currentList: ArrayList<String>
+        get() = _currentList
+
+    private val _totalTimeInference = MutableLiveData<Int>()
+
+    val totalTimeInference: LiveData<Int>
+        get() = _totalTimeInference
+
+    private val _styledBitmap = MutableLiveData<ModelExecutionResult>()
+    val styledBitmap: LiveData<ModelExecutionResult>
+        get() = _styledBitmap
+
+    private val _inferenceDone = MutableLiveData<Boolean>()
+    val inferenceDone: LiveData<Boolean>
+        get() = _inferenceDone
 
     init {
 
+        stylename = "mona.JPG"
+
+        _currentList.addAll(application.assets.list("thumbnails")!!)
+
+
+    }
+
+    fun setStyleName(string: String) {
+        stylename = string
+    }
+
+    fun setTheSeekBarProgress(progress: Float) {
+        seekBarProgress = progress
+    }
+
+    fun setScaledBitmap(bitmap: Bitmap) {
+        scaledBitmapObject = bitmap
+    }
+
+    fun onApplyStyle(
+        context: Context,
+        contentBitmap: Bitmap,
+        styleFilePath: String,
+        styleTransferModelExecutor: StyleTransferModelExecutor
+    ) {
+
+        viewModelScope.launch {
+            inferenceExecute(styleTransferModelExecutor, contentBitmap, styleFilePath, context)
+        }
+    }
+
+    private suspend fun inferenceExecute(
+        styleTransferModelExecutor: StyleTransferModelExecutor,
+        contentBitmap: Bitmap,
+        styleFilePath: String,
+        context: Context
+    ) {
+        _inferenceDone.postValue(false)
+        val result = styleTransferModelExecutor.execute(contentBitmap, styleFilePath, context)
+        _totalTimeInference.postValue(result.totalExecutionTime.toInt())
+        _styledBitmap.postValue(result)
+        _inferenceDone.postValue(true)
     }
 
     fun cropPersonFromPhoto(bitmap: Bitmap): Pair<Bitmap?, Long> {
@@ -29,7 +98,8 @@ class SegmentationAndStyleTransferViewModel(application: Application) : AndroidV
             // Initialization
             startTime = SystemClock.uptimeMillis()
             val options =
-                ImageSegmenter.ImageSegmenterOptions.builder().setOutputType(OutputType.CATEGORY_MASK).build()
+                ImageSegmenter.ImageSegmenterOptions.builder()
+                    .setOutputType(OutputType.CATEGORY_MASK).build()
             imageSegmenter =
                 ImageSegmenter.createFromFileAndOptions(
                     getApplication(),
@@ -73,7 +143,7 @@ class SegmentationAndStyleTransferViewModel(application: Application) : AndroidV
     }
 
 
-    private fun cropBitmapWithMask(original: Bitmap, mask: Bitmap?): Bitmap? {
+    fun cropBitmapWithMask(original: Bitmap, mask: Bitmap?): Bitmap? {
         if (mask == null
         ) {
             return null

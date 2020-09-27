@@ -68,6 +68,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:indeterminateTint="@android:color/black"
                         android:visibility="visible" />
 
                     <ImageView
@@ -86,10 +87,28 @@
                     android:layout_marginBottom="12dp"
                     android:gravity="center_horizontal"
                     android:visibility="visible"
-                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/frame_output" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewStyles"
+                    android:layout_width="match_parent"
+                    android:layout_height="184dp"
+                    app:layout_constraintTop_toBottomOf="@id/inference_info"
+                    android:layout_margin="2dp"
+                    android:layout_marginTop="12dp"
+                    android:background="#ccc"
+                    android:padding="2dp" />
+
+                <ImageView
+                    android:id="@+id/imageview_styled"
+                    android:layout_width="match_parent"
+                    android:layout_height="324dp"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/recyclerViewStyles"
+                    android:scaleType="fitXY" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 

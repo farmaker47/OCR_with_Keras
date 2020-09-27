@@ -6,4 +6,5 @@
     <string name="save_button_alt">Save</string>
     <string name="switch_camera">Switch camera</string>
     <string name="open_image_gallery">open image gallery</string>
+    <string name="koinStyle">koinStyle</string>
 </resources>
