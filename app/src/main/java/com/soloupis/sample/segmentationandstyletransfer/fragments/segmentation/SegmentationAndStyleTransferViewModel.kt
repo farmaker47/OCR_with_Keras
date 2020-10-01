@@ -164,5 +164,26 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         return cropped
     }
 
+    fun cropBitmapWithMaskForStyle(original: Bitmap, mask: Bitmap?): Bitmap? {
+        if (mask == null
+        ) {
+            return null
+        }
+        val w = original.width
+        val h = original.height
+        if (w <= 0 || h <= 0) {
+            return null
+        }
+        val cropped = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(cropped)
+        val paint =
+            Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_OUT)
+        canvas.drawBitmap(original, 0f, 0f, null)
+        canvas.drawBitmap(mask, 0f, 0f, paint)
+        paint.xfermode = null
+        return cropped
+    }
+
 
 }

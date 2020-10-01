@@ -118,7 +118,7 @@ class SegmentationAndStyleTransferFragment : Fragment(),
                         .load(resultImage.styledImage)
                         .fitCenter()
                         .into(binding.imageViewStyled)*/
-                    binding.imageviewStyled.setImageBitmap(viewModel.cropBitmapWithMask(resultImage.styledImage, outputBitmapFinal))//selfieBitmap
+                    binding.imageviewStyled.setImageBitmap(viewModel.cropBitmapWithMaskForStyle(resultImage.styledImage, outputBitmapFinal))//selfieBitmap
                 }
             }
         )
