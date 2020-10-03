@@ -145,19 +145,29 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         ) {
             return null
         }
+        Log.e("ORIGINAL_WIDTH", original.width.toString())
+        Log.e("ORIGINAL_HEIGHT", original.height.toString())
+        Log.e("MASK_WIDTH", original.width.toString())
+        Log.e("MASK_HEIGHT", original.height.toString())
         val w = original.width
         val h = original.height
+        Log.e("ORIGINAL_WIDTH", w.toString())
+        Log.e("ORIGINAL_HEIGHT", h.toString())
         if (w <= 0 || h <= 0) {
             return null
         }
-        val cropped = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val cropped:Bitmap = Bitmap.createBitmap(500 , 500 , Bitmap.Config.ARGB_8888)
+        Log.e("CROPPED_WIDTH", cropped.width.toString())
+        Log.e("CROPPED_HEIGHT", cropped.height.toString())
         val canvas = Canvas(cropped)
-        val paint =
-            Paint(Paint.ANTI_ALIAS_FLAG)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
         canvas.drawBitmap(original, 0f, 0f, null)
         canvas.drawBitmap(mask, 0f, 0f, paint)
         paint.xfermode = null
+
+        Log.e("CROED_WIDTH", cropped.width.toString())
+        Log.e("CROED_HEIGHT", cropped.height.toString())
         return cropped
     }
 
@@ -171,13 +181,19 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         if (w <= 0 || h <= 0) {
             return null
         }
+
+        val scaledBitmap = Bitmap.createScaledBitmap(
+            mask,
+            400,
+            400, true
+        )
+
         val cropped = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(cropped)
-        val paint =
-            Paint(Paint.ANTI_ALIAS_FLAG)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)
         canvas.drawBitmap(original, 0f, 0f, null)
-        canvas.drawBitmap(mask, 0f, 0f, paint)
+        canvas.drawBitmap(scaledBitmap, 0f, 0f, paint)
         paint.xfermode = null
         return cropped
     }
