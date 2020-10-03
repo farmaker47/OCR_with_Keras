@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
+import org.koin.core.get
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.vision.segmenter.ImageSegmenter
 import org.tensorflow.lite.task.vision.segmenter.OutputType
@@ -35,7 +36,6 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         get() = _currentList
 
     private val _totalTimeInference = MutableLiveData<Int>()
-
     val totalTimeInference: LiveData<Int>
         get() = _totalTimeInference
 
@@ -47,12 +47,15 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
     val inferenceDone: LiveData<Boolean>
         get() = _inferenceDone
 
+    lateinit var styleTransferModelExecutor: StyleTransferModelExecutor
+
     init {
 
         stylename = "mona.JPG"
 
         _currentList.addAll(application.assets.list("thumbnails")!!)
 
+        styleTransferModelExecutor = get()
 
     }
 
@@ -64,24 +67,18 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         seekBarProgress = progress
     }
 
-    fun setScaledBitmap(bitmap: Bitmap) {
-        scaledBitmapObject = bitmap
-    }
-
     fun onApplyStyle(
         context: Context,
         contentBitmap: Bitmap,
-        styleFilePath: String,
-        styleTransferModelExecutor: StyleTransferModelExecutor
+        styleFilePath: String
     ) {
 
         viewModelScope.launch {
-            inferenceExecute(styleTransferModelExecutor, contentBitmap, styleFilePath, context)
+            inferenceExecute(contentBitmap, styleFilePath, context)
         }
     }
 
     private suspend fun inferenceExecute(
-        styleTransferModelExecutor: StyleTransferModelExecutor,
         contentBitmap: Bitmap,
         styleFilePath: String,
         context: Context

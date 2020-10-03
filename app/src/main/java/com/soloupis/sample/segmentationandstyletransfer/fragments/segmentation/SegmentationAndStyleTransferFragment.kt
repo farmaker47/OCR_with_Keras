@@ -81,27 +81,24 @@ class SegmentationAndStyleTransferFragment : Fragment(),
         binding.viewModelXml = viewModel
 
         // RecyclerView setup
-        binding.recyclerViewStyles.setHasFixedSize(true)
-        binding.recyclerViewStyles.layoutManager =
-            LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         mSearchFragmentNavigationAdapter =
             SearchFragmentNavigationAdapter(
                 requireActivity(),
                 viewModel.currentList,
                 this
             )
-        binding.recyclerViewStyles.adapter = mSearchFragmentNavigationAdapter
+        binding.recyclerViewStyles.apply {
+            setHasFixedSize(true)
+            layoutManager =
+                LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+            adapter = mSearchFragmentNavigationAdapter
+
+        }
 
         // Initialize class with Koin
         styleTransferModelExecutor = get()
-        /*styleTransferModelExecutor.selectVideoQuality(5)
-        styleTransferModelExecutor.firstSelectStyle(
-            viewModel.stylename,
-            5.0f,
-            requireActivity()
-        )*/
-        getKoin().setProperty(getString(R.string.koinStyle), viewModel.stylename)
 
+        getKoin().setProperty(getString(R.string.koinStyle), viewModel.stylename)
 
         observeViewModel()
 
@@ -118,7 +115,12 @@ class SegmentationAndStyleTransferFragment : Fragment(),
                         .load(resultImage.styledImage)
                         .fitCenter()
                         .into(binding.imageViewStyled)*/
-                    binding.imageviewStyled.setImageBitmap(viewModel.cropBitmapWithMaskForStyle(resultImage.styledImage, outputBitmapFinal))//selfieBitmap
+                    binding.imageviewStyled.setImageBitmap(
+                        viewModel.cropBitmapWithMaskForStyle(
+                            resultImage.styledImage,
+                            outputBitmapFinal
+                        )
+                    )//selfieBitmap
                 }
             }
         )
@@ -240,25 +242,18 @@ class SegmentationAndStyleTransferFragment : Fragment(),
 
     private fun updateUI(outputBitmap: Bitmap?, inferenceTime: Long) {
         progressbar.visibility = View.GONE
+        imageview_input.visibility = View.INVISIBLE
         imageview_output?.setImageBitmap(outputBitmap)
         inference_info.text = "Total process time: " + inferenceTime.toString() + "ms"
 
         //showStyledImage("mona.JPG")
     }
 
-    private fun showStyledImage(style:String) {
+    private fun showStyledImage(style: String) {
         lifecycleScope.launch(Dispatchers.Default) {
-            /*styleTransferModelExecutor.selectStyle(
-                type,
-                5.0f,
-                scaledBitmap,
-                requireActivity()
-            )*/
-
-            viewModel.setScaledBitmap(scaledBitmap)
 
             viewModel.onApplyStyle(
-                requireActivity(), scaledBitmap, style, styleTransferModelExecutor
+                requireActivity(), scaledBitmap, style
             )
         }
     }
