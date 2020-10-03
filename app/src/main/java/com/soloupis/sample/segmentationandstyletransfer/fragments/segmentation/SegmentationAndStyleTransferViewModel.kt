@@ -175,7 +175,7 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         val canvas = Canvas(cropped)
         val paint =
             Paint(Paint.ANTI_ALIAS_FLAG)
-        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_OUT)
+        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)
         canvas.drawBitmap(original, 0f, 0f, null)
         canvas.drawBitmap(mask, 0f, 0f, paint)
         paint.xfermode = null

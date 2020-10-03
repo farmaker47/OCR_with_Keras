@@ -42,8 +42,8 @@
 
                 <ImageView
                     android:id="@+id/imageview_input"
-                    android:layout_width="224dp"
-                    android:layout_height="224dp"
+                    android:layout_width="244dp"
+                    android:layout_height="244dp"
                     android:layout_marginBottom="12dp"
                     android:background="@color/colorAccent"
                     android:scaleType="fitXY"
@@ -55,8 +55,8 @@
 
                 <FrameLayout
                     android:id="@+id/frame_output"
-                    android:layout_width="224dp"
-                    android:layout_height="224dp"
+                    android:layout_width="254dp"
+                    android:layout_height="254dp"
                     android:scaleType="fitXY"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -104,8 +104,8 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     android:id="@+id/imageview_styled"
-                    android:layout_width="224dp"
-                    android:layout_height="224dp"
+                    android:layout_width="244dp"
+                    android:layout_height="244dp"
                     android:layout_marginTop="16dp"
                     app:layout_constraintTop_toBottomOf="@id/recyclerViewStyles"
                     android:scaleType="fitXY" />
