@@ -84,7 +84,7 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         context: Context
     ) {
         _inferenceDone.postValue(false)
-        val result = styleTransferModelExecutor.execute(contentBitmap, styleFilePath, context)
+        val result = styleTransferModelExecutor.executeWithMLBinding(contentBitmap, styleFilePath, context)
         _totalTimeInference.postValue(result.totalExecutionTime.toInt())
         _styledBitmap.postValue(result)
         _inferenceDone.postValue(true)
@@ -198,5 +198,9 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         return cropped
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        styleTransferModelExecutor.close()
+    }
 
 }
