@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.Toast
@@ -19,6 +20,7 @@ import com.soloupis.sample.segmentationandstyletransfer.ImageUtils
 import com.soloupis.sample.segmentationandstyletransfer.MainActivity
 import com.soloupis.sample.segmentationandstyletransfer.R
 import com.soloupis.sample.segmentationandstyletransfer.databinding.FragmentSelfie2segmentationBinding
+import com.soloupis.sample.segmentationandstyletransfer.fragments.StyleFragment
 import kotlinx.android.synthetic.main.fragment_selfie2segmentation.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,7 +40,8 @@ import java.util.*
  * This is where we show both the captured input image and the output image
  */
 class SegmentationAndStyleTransferFragment : Fragment(),
-    SearchFragmentNavigationAdapter.SearchClickItemListener {
+    SearchFragmentNavigationAdapter.SearchClickItemListener,
+    StyleFragment.OnListFragmentInteractionListener {
 
     private val args: SegmentationAndStyleTransferFragmentArgs by navArgs()
     private lateinit var filePath: String
@@ -61,6 +64,7 @@ class SegmentationAndStyleTransferFragment : Fragment(),
     private lateinit var selfieBitmap: Bitmap
     private var outputBitmapFinal: Bitmap? = null
     private var inferenceTime: Long = 0L
+    private val stylesFragment: StyleFragment = StyleFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,6 +105,11 @@ class SegmentationAndStyleTransferFragment : Fragment(),
         getKoin().setProperty(getString(R.string.koinStyle), viewModel.stylename)
 
         observeViewModel()
+
+        // Click on Style picker
+        binding.chooseStyleTextView.setOnClickListener{
+            stylesFragment.show(requireActivity().supportFragmentManager, "StylesFragment")
+        }
 
         return binding.root
     }
@@ -244,4 +253,21 @@ class SegmentationAndStyleTransferFragment : Fragment(),
 
     }
 
+    override fun onListFragmentInteraction(item: String) {
+    }
+
+    fun methodToStartStyleTransfer(item:String){
+
+        stylesFragment.dismiss()
+
+        scaledBitmap = Bitmap.createScaledBitmap(
+            selfieBitmap,
+            MODEL_WIDTH,
+            MODEL_HEIGHT, true
+        )
+
+        showStyledImage(item)
+        getKoin().setProperty(getString(R.string.koinStyle), item)
+        viewModel.setStyleName(item)
+    }
 }

@@ -7,4 +7,6 @@
     <string name="switch_camera">Switch camera</string>
     <string name="open_image_gallery">open image gallery</string>
     <string name="koinStyle">koinStyle</string>
+    <string name="choose_a_style" translatable="false">Choose a Style</string>
+
 </resources>

@@ -45,7 +45,7 @@ class StyleTransferModelExecutor(
     private var stylePredictTime = 0L
     private var styleTransferTime = 0L
     private var postProcessTime = 0L
-    private lateinit var modelPredict: MagentaArbitraryImageStylizationV1256Fp16Prediction1
+    private var modelPredict: MagentaArbitraryImageStylizationV1256Fp16Prediction1
     private var modelTransfer: MagentaArbitraryImageStylizationV1256Fp16Transfer1
 
     init {

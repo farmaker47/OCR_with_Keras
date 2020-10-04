@@ -5,10 +5,14 @@ import android.os.Bundle
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import com.soloupis.sample.segmentationandstyletransfer.fragments.StyleFragment
+import com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation.SegmentationAndStyleTransferFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
-class MainActivity : AppCompatActivity() {
+
+class MainActivity : AppCompatActivity(),
+    StyleFragment.OnListFragmentInteractionListener {
 
     private lateinit var container: FrameLayout
 
@@ -33,4 +37,15 @@ class MainActivity : AppCompatActivity() {
                 mediaDir else appContext.filesDir
         }
     }
+
+    override fun onListFragmentInteraction(item: String) {
+
+        // Find fragment and execute method
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+        val fragment= navHostFragment?.childFragmentManager?.fragments?.get(0)
+        (fragment as SegmentationAndStyleTransferFragment).methodToStartStyleTransfer(item)
+
+    }
+
+
 }
