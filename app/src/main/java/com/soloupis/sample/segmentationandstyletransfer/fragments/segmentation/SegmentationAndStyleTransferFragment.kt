@@ -162,6 +162,8 @@ class SegmentationAndStyleTransferFragment : Fragment(),
                     )
                 )
 
+
+
             Glide.with(imageview_input.context)
                 .load(selfieBitmap)
                 .into(imageview_input)
