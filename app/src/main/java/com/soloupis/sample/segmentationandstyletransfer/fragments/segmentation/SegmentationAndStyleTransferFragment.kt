@@ -156,7 +156,7 @@ class SegmentationAndStyleTransferFragment : Fragment(),
                 Observer { loadingDone ->
                     when (loadingDone) {
                         true -> binding.progressbarStyle.visibility = View.GONE
-                        false -> binding.progressbarStyle.visibility = View.VISIBLE
+                        //false -> binding.progressbarStyle.visibility = View.VISIBLE
                     }
                 }
         )
@@ -295,6 +295,9 @@ class SegmentationAndStyleTransferFragment : Fragment(),
     }
 
     override fun onListItemClick(itemIndex: Int, sharedImage: ImageView?, type: String) {
+
+        // Upon click show rogress bar
+        binding.progressbarStyle.visibility = View.VISIBLE
 
         // Created scaled version of bitmap for model input.
         scaledBitmap = Bitmap.createScaledBitmap(

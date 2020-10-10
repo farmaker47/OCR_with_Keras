@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.get
@@ -19,8 +20,8 @@ import org.tensorflow.lite.task.vision.segmenter.Segmentation
 import java.io.IOException
 
 class SegmentationAndStyleTransferViewModel(application: Application) :
-    AndroidViewModel(application),
-    KoinComponent {
+        AndroidViewModel(application),
+        KoinComponent {
 
     private lateinit var imageSegmenter: ImageSegmenter
     private lateinit var scaledMaskBitmap: Bitmap
@@ -68,22 +69,22 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
     }
 
     fun onApplyStyle(
-        context: Context,
-        contentBitmap: Bitmap,
-        styleFilePath: String
+            context: Context,
+            contentBitmap: Bitmap,
+            styleFilePath: String
     ) {
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             inferenceExecute(contentBitmap, styleFilePath, context)
         }
     }
 
     private fun inferenceExecute(
-        contentBitmap: Bitmap,
-        styleFilePath: String,
-        context: Context
+            contentBitmap: Bitmap,
+            styleFilePath: String,
+            context: Context
     ) {
-        _inferenceDone.postValue(false)
+        //_inferenceDone.value = false
         val result = styleTransferModelExecutor.executeWithMLBinding(contentBitmap, styleFilePath, context)
         _totalTimeInference.postValue(result.totalExecutionTime.toInt())
         _styledBitmap.postValue(result)
@@ -95,14 +96,14 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
             // Initialization
             startTime = SystemClock.uptimeMillis()
             val options =
-                ImageSegmenter.ImageSegmenterOptions.builder()
-                    .setOutputType(OutputType.CATEGORY_MASK).build()
+                    ImageSegmenter.ImageSegmenterOptions.builder()
+                            .setOutputType(OutputType.CATEGORY_MASK).build()
             imageSegmenter =
-                ImageSegmenter.createFromFileAndOptions(
-                    getApplication(),
-                    "deeplabv3.tflite",
-                    options
-                )
+                    ImageSegmenter.createFromFileAndOptions(
+                            getApplication(),
+                            "deeplabv3.tflite",
+                            options
+                    )
 
             // Run inference
             val tensorImage = TensorImage.fromBitmap(bitmap)
@@ -116,21 +117,21 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
             Log.i("VALUES", rawMask.contentToString())
 
             val output = Bitmap.createBitmap(
-                tensorMask.width,
-                tensorMask.height,
-                Bitmap.Config.ARGB_8888
+                    tensorMask.width,
+                    tensorMask.height,
+                    Bitmap.Config.ARGB_8888
             )
             for (y in 0 until tensorMask.height) {
                 for (x in 0 until tensorMask.width) {
                     output.setPixel(
-                        x,
-                        y,
-                        if (rawMask[y * tensorMask.width + x] == 0) Color.TRANSPARENT else Color.BLACK
+                            x,
+                            y,
+                            if (rawMask[y * tensorMask.width + x] == 0) Color.TRANSPARENT else Color.BLACK
                     )
                 }
             }
             scaledMaskBitmap =
-                Bitmap.createScaledBitmap(output, bitmap.getWidth(), bitmap.getHeight(), true)
+                    Bitmap.createScaledBitmap(output, bitmap.getWidth(), bitmap.getHeight(), true)
             inferenceTime = SystemClock.uptimeMillis() - startTime
         } catch (e: IOException) {
             Log.e("ImageSegmenter", "Error: ", e)
@@ -156,7 +157,7 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         if (w <= 0 || h <= 0) {
             return null
         }
-        val cropped:Bitmap = Bitmap.createBitmap(500 , 500 , Bitmap.Config.ARGB_8888)
+        val cropped: Bitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
         Log.e("CROPPED_WIDTH", cropped.width.toString())
         Log.e("CROPPED_HEIGHT", cropped.height.toString())
         val canvas = Canvas(cropped)
@@ -183,9 +184,9 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         }
 
         val scaledBitmap = Bitmap.createScaledBitmap(
-            mask,
-            400,
-            400, true
+                mask,
+                400,
+                400, true
         )
 
         val cropped = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
