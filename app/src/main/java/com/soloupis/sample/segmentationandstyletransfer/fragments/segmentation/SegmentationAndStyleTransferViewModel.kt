@@ -78,7 +78,7 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         }
     }
 
-    private suspend fun inferenceExecute(
+    private fun inferenceExecute(
         contentBitmap: Bitmap,
         styleFilePath: String,
         context: Context

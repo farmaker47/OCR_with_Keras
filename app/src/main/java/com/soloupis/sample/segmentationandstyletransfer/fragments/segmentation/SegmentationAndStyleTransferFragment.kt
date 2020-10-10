@@ -40,8 +40,8 @@ import java.util.*
  * This is where we show both the captured input image and the output image
  */
 class SegmentationAndStyleTransferFragment : Fragment(),
-    SearchFragmentNavigationAdapter.SearchClickItemListener,
-    StyleFragment.OnListFragmentInteractionListener {
+        SearchFragmentNavigationAdapter.SearchClickItemListener,
+        StyleFragment.OnListFragmentInteractionListener {
 
     private val args: SegmentationAndStyleTransferFragmentArgs by navArgs()
     private lateinit var filePath: String
@@ -76,8 +76,8 @@ class SegmentationAndStyleTransferFragment : Fragment(),
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentSelfie2segmentationBinding.inflate(inflater)
@@ -86,15 +86,15 @@ class SegmentationAndStyleTransferFragment : Fragment(),
 
         // RecyclerView setup
         mSearchFragmentNavigationAdapter =
-            SearchFragmentNavigationAdapter(
-                requireActivity(),
-                viewModel.currentList,
-                this
-            )
+                SearchFragmentNavigationAdapter(
+                        requireActivity(),
+                        viewModel.currentList,
+                        this
+                )
         binding.recyclerViewStyles.apply {
             setHasFixedSize(true)
             layoutManager =
-                LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+                    LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
             adapter = mSearchFragmentNavigationAdapter
 
         }
@@ -107,8 +107,24 @@ class SegmentationAndStyleTransferFragment : Fragment(),
         observeViewModel()
 
         // Click on Style picker
-        binding.chooseStyleTextView.setOnClickListener{
+        binding.chooseStyleTextView.setOnClickListener {
             stylesFragment.show(requireActivity().supportFragmentManager, "StylesFragment")
+        }
+
+        // Listeners for toggle buttons
+        binding.imageToggleLeft.setOnClickListener {
+
+            // Make input ImageView visible
+            binding.imageviewInput.visibility = View.VISIBLE
+            // Make output Image gone
+            binding.imageviewOutput.visibility = View.GONE
+        }
+        binding.imageToggleRight.setOnClickListener {
+
+            // Make input ImageView gone
+            binding.imageviewInput.visibility = View.GONE
+            // Make output Image visible
+            binding.imageviewOutput.visibility = View.VISIBLE
         }
 
         return binding.root
@@ -117,21 +133,39 @@ class SegmentationAndStyleTransferFragment : Fragment(),
     private fun observeViewModel() {
 
         viewModel.styledBitmap.observe(
-            requireActivity(),
-            Observer { resultImage ->
-                if (resultImage != null) {
-                    /*Glide.with(activity!!)
-                        .load(resultImage.styledImage)
-                        .fitCenter()
-                        .into(binding.imageViewStyled)*/
-                    binding.imageviewStyled.setImageBitmap(
-                        viewModel.cropBitmapWithMaskForStyle(
-                            resultImage.styledImage,
-                            outputBitmapFinal
-                        )
-                    )//selfieBitmap
+                requireActivity(),
+                Observer { resultImage ->
+                    if (resultImage != null) {
+                        /*Glide.with(activity!!)
+                            .load(resultImage.styledImage)
+                            .fitCenter()
+                            .into(binding.imageViewStyled)*/
+                        binding.imageviewStyled.setImageBitmap(
+                                viewModel.cropBitmapWithMaskForStyle(
+                                        resultImage.styledImage,
+                                        outputBitmapFinal
+                                )
+                        )//selfieBitmap
+                    }
                 }
-            }
+        )
+
+        // Observe style transfer procedure
+        viewModel.inferenceDone.observe(
+                requireActivity(),
+                Observer { loadingDone ->
+                    when (loadingDone) {
+                        true -> binding.progressbarStyle.visibility = View.GONE
+                        false -> binding.progressbarStyle.visibility = View.VISIBLE
+                    }
+                }
+        )
+
+        viewModel.totalTimeInference.observe(
+                requireActivity(),
+                Observer { time ->
+                    //binding.inferenceInfoStyle.text = "Total process time: ${time}ms"
+                }
         )
     }
 
@@ -141,39 +175,59 @@ class SegmentationAndStyleTransferFragment : Fragment(),
             photoFile = File(filePath)
 
             Glide.with(imageview_input.context)
-                .load(photoFile)
-                .into(imageview_input)
+                    .load(photoFile)
+                    .into(imageview_input)
+
+            // Make input ImageView visible
+            binding.imageviewInput.visibility = View.VISIBLE
 
             selfieBitmap = BitmapFactory.decodeFile(filePath)
             lifecycleScope.launch(Dispatchers.Default) {
                 val (outputBitmap, inferenceTime) = viewModel.cropPersonFromPhoto(selfieBitmap)
                 outputBitmapFinal = outputBitmap
                 withContext(Dispatchers.Main) {
+
+                    // Make input ImageView gone
+                    binding.imageviewInput.visibility = View.GONE
+
                     updateUI(outputBitmap, inferenceTime)
                     finalBitmap = outputBitmap
+
+                    // Make output Image visible
+                    binding.imageviewOutput.visibility = View.VISIBLE
+
                 }
             }
         } else {
 
             selfieBitmap =
-                BitmapFactory.decodeStream(
-                    requireActivity().contentResolver.openInputStream(
-                        filePath.toUri()
+                    BitmapFactory.decodeStream(
+                            requireActivity().contentResolver.openInputStream(
+                                    filePath.toUri()
+                            )
                     )
-                )
-
-
 
             Glide.with(imageview_input.context)
-                .load(selfieBitmap)
-                .into(imageview_input)
+                    .load(selfieBitmap)
+                    .into(imageview_input)
+
+            // Make input ImageView visible
+            binding.imageviewInput.visibility = View.VISIBLE
 
             lifecycleScope.launch(Dispatchers.Default) {
                 val (outputBitmap, inferenceTime) = viewModel.cropPersonFromPhoto(selfieBitmap)
                 outputBitmapFinal = outputBitmap
                 withContext(Dispatchers.Main) {
+
+                    // Make input ImageView gone
+                    binding.imageviewInput.visibility = View.GONE
+
                     updateUI(outputBitmap, inferenceTime)
                     finalBitmap = outputBitmap
+
+                    // Make output Image visible
+                    binding.imageviewOutput.visibility = View.VISIBLE
+
                 }
             }
 
@@ -194,7 +248,7 @@ class SegmentationAndStyleTransferFragment : Fragment(),
         lifecycleScope.launch(Dispatchers.Default) {
 
             viewModel.onApplyStyle(
-                requireActivity(), scaledBitmap, style
+                    requireActivity(), scaledBitmap, style
             )
         }
     }
@@ -219,15 +273,15 @@ class SegmentationAndStyleTransferFragment : Fragment(),
     private fun saveImageToSDCard(bitmap: Bitmap?): String {
 
         val file = File(
-            MainActivity.getOutputDirectory(requireContext()),
-            SimpleDateFormat(
-                FILENAME_FORMAT, Locale.US
-            ).format(System.currentTimeMillis()) + "_segmentation.jpg"
+                MainActivity.getOutputDirectory(requireContext()),
+                SimpleDateFormat(
+                        FILENAME_FORMAT, Locale.US
+                ).format(System.currentTimeMillis()) + "_segmentation.jpg"
         )
 
         ImageUtils.saveBitmap(bitmap, file)
         Toast.makeText(context, "saved to " + file.absolutePath.toString(), Toast.LENGTH_SHORT)
-            .show()
+                .show()
 
         return file.absolutePath
 
@@ -244,9 +298,9 @@ class SegmentationAndStyleTransferFragment : Fragment(),
 
         // Created scaled version of bitmap for model input.
         scaledBitmap = Bitmap.createScaledBitmap(
-            selfieBitmap,
-            MODEL_WIDTH,
-            MODEL_HEIGHT, true
+                selfieBitmap,
+                MODEL_WIDTH,
+                MODEL_HEIGHT, true
         )
 
         showStyledImage(type)
@@ -258,14 +312,14 @@ class SegmentationAndStyleTransferFragment : Fragment(),
     override fun onListFragmentInteraction(item: String) {
     }
 
-    fun methodToStartStyleTransfer(item:String){
+    fun methodToStartStyleTransfer(item: String) {
 
         stylesFragment.dismiss()
 
         scaledBitmap = Bitmap.createScaledBitmap(
-            selfieBitmap,
-            MODEL_WIDTH,
-            MODEL_HEIGHT, true
+                selfieBitmap,
+                MODEL_WIDTH,
+                MODEL_HEIGHT, true
         )
 
         showStyledImage(item)
