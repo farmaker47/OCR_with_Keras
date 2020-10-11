@@ -3,13 +3,13 @@ package com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.soloupis.sample.segmentationandstyletransfer.R
 import com.soloupis.sample.segmentationandstyletransfer.databinding.SearchFragmentAdapterBinding

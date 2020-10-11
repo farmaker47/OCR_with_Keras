@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewImageAdapter"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginEnd="2dp"
+        android:layout_marginTop="10dp"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground">
@@ -26,5 +27,6 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
+
 
 </layout>
