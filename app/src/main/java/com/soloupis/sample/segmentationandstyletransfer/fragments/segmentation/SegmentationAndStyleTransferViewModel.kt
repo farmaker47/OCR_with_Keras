@@ -84,8 +84,12 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
             styleFilePath: String,
             context: Context
     ) {
-        //_inferenceDone.value = false
-        val result = styleTransferModelExecutor.executeWithMLBinding(contentBitmap, styleFilePath, context)
+
+        // Below use Standard interpreter or ML binding...uncomment at your choice
+        //******************************
+        //val result = styleTransferModelExecutor.executeWithMLBinding(contentBitmap, styleFilePath, context)
+        val result = styleTransferModelExecutor.executeWithInterpreter(contentBitmap, styleFilePath, context)
+        //******************************
         _totalTimeInference.postValue(result.totalExecutionTime.toInt())
         _styledBitmap.postValue(result)
         _inferenceDone.postValue(true)
@@ -146,20 +150,18 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         ) {
             return null
         }
-        Log.e("ORIGINAL_WIDTH", original.width.toString())
-        Log.e("ORIGINAL_HEIGHT", original.height.toString())
-        Log.e("MASK_WIDTH", original.width.toString())
-        Log.e("MASK_HEIGHT", original.height.toString())
+        Log.i("ORIGINAL_WIDTH", original.width.toString())
+        Log.i("ORIGINAL_HEIGHT", original.height.toString())
+        Log.i("MASK_WIDTH", original.width.toString())
+        Log.i("MASK_HEIGHT", original.height.toString())
         val w = original.width
         val h = original.height
-        Log.e("ORIGINAL_WIDTH", w.toString())
-        Log.e("ORIGINAL_HEIGHT", h.toString())
         if (w <= 0 || h <= 0) {
             return null
         }
         val cropped: Bitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
-        Log.e("CROPPED_WIDTH", cropped.width.toString())
-        Log.e("CROPPED_HEIGHT", cropped.height.toString())
+        Log.i("CROPPED_WIDTH", cropped.width.toString())
+        Log.i("CROPPED_HEIGHT", cropped.height.toString())
         val canvas = Canvas(cropped)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
@@ -167,8 +169,6 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         canvas.drawBitmap(mask, 0f, 0f, paint)
         paint.xfermode = null
 
-        Log.e("CROED_WIDTH", cropped.width.toString())
-        Log.e("CROED_HEIGHT", cropped.height.toString())
         return cropped
     }
 

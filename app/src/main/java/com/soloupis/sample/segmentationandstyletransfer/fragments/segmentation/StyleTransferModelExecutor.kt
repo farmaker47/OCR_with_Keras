@@ -37,8 +37,8 @@ class StyleTransferModelExecutor(
     private var gpuDelegate: GpuDelegate? = null
     private var numberThreads = 4
 
-    //private val interpreterPredict: Interpreter
-    //private val interpreterTransform: Interpreter
+    private val interpreterPredict: Interpreter
+    private val interpreterTransform: Interpreter
 
     private var fullExecutionTime = 0L
     private var preProcessTime = 0L
@@ -49,7 +49,7 @@ class StyleTransferModelExecutor(
     private var modelTransfer: MagentaArbitraryImageStylizationV1256Fp16Transfer1
 
     init {
-        /*if (useGPU) {
+        if (useGPU) {
             interpreterPredict = getInterpreter(context, STYLE_PREDICT_FLOAT16_MODEL, true)
             interpreterTransform = getInterpreter(context, STYLE_TRANSFER_FLOAT16_MODEL, true)
             Log.e("GPU_TRUE", "TRUE")
@@ -57,7 +57,7 @@ class StyleTransferModelExecutor(
             interpreterPredict = getInterpreter(context, STYLE_PREDICT_INT8_MODEL, false)
             interpreterTransform = getInterpreter(context, STYLE_TRANSFER_INT8_MODEL, false)
             Log.e("GPU_FALSE", "FALSE")
-        }*/
+        }
 
         // ML binding
         modelPredict = MagentaArbitraryImageStylizationV1256Fp16Prediction1.newInstance(context)
@@ -69,10 +69,10 @@ class StyleTransferModelExecutor(
         private const val STYLE_IMAGE_SIZE = 256
         private const val CONTENT_IMAGE_SIZE = 384
         private const val BOTTLENECK_SIZE = 100
-        //private const val STYLE_PREDICT_INT8_MODEL = "style_predict_quantized_256.tflite"
-        //private const val STYLE_TRANSFER_INT8_MODEL = "style_transfer_quantized_384.tflite"
-        //private const val STYLE_PREDICT_FLOAT16_MODEL = "style_predict_f16_256.tflite"
-        //private const val STYLE_TRANSFER_FLOAT16_MODEL = "style_transfer_f16_384.tflite"
+        private const val STYLE_PREDICT_INT8_MODEL = "style_predict_quantized_256.tflite"
+        private const val STYLE_TRANSFER_INT8_MODEL = "style_transfer_quantized_384.tflite"
+        private const val STYLE_PREDICT_FLOAT16_MODEL = "style_predict_f16_256.tflite"
+        private const val STYLE_TRANSFER_FLOAT16_MODEL = "style_transfer_f16_384.tflite"
     }
 
     fun executeWithMLBinding(
@@ -141,7 +141,7 @@ class StyleTransferModelExecutor(
 
 
     // NOT USED
-    fun execute(
+    fun executeWithInterpreter(
         contentImagePath: Bitmap,
         styleImageName: String,
         context: Context
@@ -151,7 +151,6 @@ class StyleTransferModelExecutor(
 
             fullExecutionTime = SystemClock.uptimeMillis()
             preProcessTime = SystemClock.uptimeMillis()
-
 
             //***************************************************
             // to use for transfer
@@ -177,11 +176,9 @@ class StyleTransferModelExecutor(
             // The results of this inference could be reused given the style does not change
             // That would be a good practice in case this was applied to a video stream.
 
-
             //*************************
-            //interpreterPredict.runForMultipleInputsOutputs(inputsForPredict, outputsForPredict)
+            interpreterPredict.runForMultipleInputsOutputs(inputsForPredict, outputsForPredict)
             //****************************
-
 
             stylePredictTime = SystemClock.uptimeMillis() - stylePredictTime
             Log.d(TAG, "Style Predict Time to run: $stylePredictTime")
@@ -197,21 +194,18 @@ class StyleTransferModelExecutor(
             //************************************************
 
             styleTransferTime = SystemClock.uptimeMillis()
-            /*interpreterTransform.runForMultipleInputsOutputs(
+            interpreterTransform.runForMultipleInputsOutputs(
                 inputsForStyleTransfer,
                 outputsForStyleTransfer
-            )*/
+            )
             styleTransferTime = SystemClock.uptimeMillis() - styleTransferTime
             Log.d(TAG, "Style apply Time to run: $styleTransferTime")
 
             postProcessTime = SystemClock.uptimeMillis()
 
-
             //***************************************
             val styledImage = ImageUtils.convertArrayToBitmap(outputImage, CONTENT_IMAGE_SIZE, CONTENT_IMAGE_SIZE)
             //**************************************
-
-
 
             postProcessTime = SystemClock.uptimeMillis() - postProcessTime
 
@@ -242,7 +236,7 @@ class StyleTransferModelExecutor(
         }
     }
 
-    /*@Throws(IOException::class)
+    @Throws(IOException::class)
     private fun loadModelFile(context: Context, modelFile: String): MappedByteBuffer {
         val fileDescriptor = context.assets.openFd(modelFile)
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
@@ -252,16 +246,19 @@ class StyleTransferModelExecutor(
         val retFile = fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
         fileDescriptor.close()
         return retFile
-    }*/
+    }
 
-    /*@Throws(IOException::class)
+    @Throws(IOException::class)
     private fun getInterpreter(
         context: Context,
         modelName: String,
         useGpu: Boolean = false
     ): Interpreter {
         val tfliteOptions = Interpreter.Options()
-        tfliteOptions.setNumThreads(numberThreads)
+
+        // Use CPU threads or XNNPACK
+        //tfliteOptions.setNumThreads(numberThreads)
+        tfliteOptions.setUseXNNPACK(true)
 
         gpuDelegate = null
         if (useGpu) {
@@ -271,7 +268,7 @@ class StyleTransferModelExecutor(
 
         tfliteOptions.setNumThreads(numberThreads)
         return Interpreter(loadModelFile(context, modelName), tfliteOptions)
-    }*/
+    }
 
     private fun formatExecutionLog(): String {
         val sb = StringBuilder()

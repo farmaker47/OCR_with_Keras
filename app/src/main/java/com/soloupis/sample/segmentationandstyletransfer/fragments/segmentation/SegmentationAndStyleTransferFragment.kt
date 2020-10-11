@@ -156,7 +156,6 @@ class SegmentationAndStyleTransferFragment : Fragment(),
                 Observer { loadingDone ->
                     when (loadingDone) {
                         true -> binding.progressbarStyle.visibility = View.GONE
-                        //false -> binding.progressbarStyle.visibility = View.VISIBLE
                     }
                 }
         )
