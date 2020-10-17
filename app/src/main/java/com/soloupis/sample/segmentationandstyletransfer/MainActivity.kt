@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.findNavController
 import com.soloupis.sample.segmentationandstyletransfer.fragments.StyleFragment
 import com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation.SegmentationAndStyleTransferFragment
+import com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation.SegmentationAndStyleTransferFragmentDirections
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
@@ -23,6 +25,14 @@ class MainActivity : AppCompatActivity(),
             WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        title = ""
+
+        // Navigate back to Camera fragment
+        imageViewBack.setOnClickListener {
+            val action = SegmentationAndStyleTransferFragmentDirections.backHome()
+            findNavController(R.id.fragment_container).navigate(action)
+        }
 
     }
 
