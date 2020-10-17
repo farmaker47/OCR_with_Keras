@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.get
+import org.koin.core.inject
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.vision.segmenter.ImageSegmenter
 import org.tensorflow.lite.task.vision.segmenter.OutputType
@@ -48,7 +49,7 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
     val inferenceDone: LiveData<Boolean>
         get() = _inferenceDone
 
-    lateinit var styleTransferModelExecutor: StyleTransferModelExecutor
+    val styleTransferModelExecutor: StyleTransferModelExecutor
 
     init {
 
@@ -87,8 +88,8 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
 
         // Below use Standard interpreter or ML binding...uncomment at your choice
         //******************************
-        //val result = styleTransferModelExecutor.executeWithMLBinding(contentBitmap, styleFilePath, context)
-        val result = styleTransferModelExecutor.executeWithInterpreter(contentBitmap, styleFilePath, context)
+        val result = styleTransferModelExecutor.executeWithMLBinding(contentBitmap, styleFilePath, context)
+        //val result = styleTransferModelExecutor.executeWithInterpreter(contentBitmap, styleFilePath, context)
         //******************************
         _totalTimeInference.postValue(result.totalExecutionTime.toInt())
         _styledBitmap.postValue(result)
