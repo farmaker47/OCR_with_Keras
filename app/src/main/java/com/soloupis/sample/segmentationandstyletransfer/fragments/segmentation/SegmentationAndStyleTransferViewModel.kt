@@ -159,7 +159,7 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
         if (w <= 0 || h <= 0) {
             return null
         }
-        val cropped: Bitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
+        val cropped: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         Log.i("CROPPED_WIDTH", cropped.width.toString())
         Log.i("CROPPED_HEIGHT", cropped.height.toString())
         val canvas = Canvas(cropped)
@@ -185,8 +185,8 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
 
         val scaledBitmap = Bitmap.createScaledBitmap(
                 mask,
-                400,
-                400, true
+                w,
+                h, true
         )
 
         val cropped = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
