@@ -142,7 +142,7 @@ class SegmentationAndStyleTransferFragment : Fragment(),
                             .fitCenter()
                             .into(binding.imageViewStyled)*/
 
-                        // Set this to use with save functionn
+                        // Set this to use with save function
                         finalBitmapWithStyle = viewModel.cropBitmapWithMaskForStyle(
                                 resultImage.styledImage,
                                 outputBitmapFinal
@@ -181,15 +181,17 @@ class SegmentationAndStyleTransferFragment : Fragment(),
         if (filePath.startsWith("/storage")) {
             photoFile = File(filePath)
 
-            Glide.with(imageview_input.context)
+            /*Glide.with(imageview_input.context)
                     .load(photoFile)
                     .fitCenter()
-                    .into(imageview_input)
+                    .into(imageview_input)*/
 
             // Make input ImageView visible
             binding.imageviewInput.visibility = View.VISIBLE
 
             selfieBitmap = BitmapFactory.decodeFile(filePath)
+            imageview_input.setImageBitmap(selfieBitmap)
+
             lifecycleScope.launch(Dispatchers.Default) {
                 val (outputBitmap, inferenceTime) = viewModel.cropPersonFromPhoto(selfieBitmap)
                 outputBitmapFinal = outputBitmap
@@ -311,6 +313,8 @@ class SegmentationAndStyleTransferFragment : Fragment(),
 
         // Upon click show rogress bar
         binding.progressbarStyle.visibility = View.VISIBLE
+        // make placeholder gone
+        imageview_placeholder.visibility = View.GONE
 
         // Created scaled version of bitmap for model input.
         scaledBitmap = Bitmap.createScaledBitmap(

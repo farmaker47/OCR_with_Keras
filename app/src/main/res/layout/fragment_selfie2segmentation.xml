@@ -47,8 +47,8 @@
 
                 <FrameLayout
                     android:id="@+id/frame_output"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="244dp"
+                    android:layout_height="244dp"
                     android:layout_marginTop="16dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -56,8 +56,8 @@
 
                     <ImageView
                         android:id="@+id/imageview_input"
-                        android:layout_width="244dp"
-                        android:layout_height="244dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:background="@drawable/dark_gray_border"
                         android:visibility="gone" />
 
@@ -66,15 +66,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:indeterminateTint="@android:color/black"
+                        android:indeterminateTint="@color/dark_gray"
                         android:visibility="visible" />
 
                     <ImageView
                         android:id="@+id/imageview_output"
-                        android:layout_width="254dp"
-                        android:layout_height="254dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:background="@drawable/light_gray_border"
-                        android:scaleType="fitXY"
                         android:visibility="gone" />
                 </FrameLayout>
 
@@ -178,8 +177,8 @@
 
                 <FrameLayout
                     android:id="@+id/frame_output_style"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="244dp"
+                    android:layout_height="244dp"
                     android:layout_marginTop="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -187,10 +186,19 @@
 
                     <ImageView
                         android:id="@+id/imageview_styled"
-                        android:layout_width="244dp"
-                        android:layout_height="244dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:background="@drawable/light_gray_border"
-                        android:scaleType="fitXY"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/imageview_placeholder"
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:visibility="visible"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_painting_brush"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
 
@@ -199,7 +207,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:indeterminateTint="@android:color/black"
+                        android:indeterminateTint="@color/dark_gray"
                         android:visibility="gone" />
 
                 </FrameLayout>
