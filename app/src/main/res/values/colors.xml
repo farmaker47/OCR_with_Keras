@@ -8,4 +8,7 @@
     <color name="icFocused">#DDFFFFFF</color>
     <color name="icPressed">#AAFFFFFF</color>
     <color name="semi_transparent">#66000000</color>
+
+    <color name="light_gray">#dbdbdb</color>
+    <color name="dark_gray">#858585</color>
 </resources>

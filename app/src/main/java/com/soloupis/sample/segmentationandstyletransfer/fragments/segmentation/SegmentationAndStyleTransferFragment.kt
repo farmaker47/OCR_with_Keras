@@ -46,6 +46,7 @@ class SegmentationAndStyleTransferFragment : Fragment(),
     private val args: SegmentationAndStyleTransferFragmentArgs by navArgs()
     private lateinit var filePath: String
     private var finalBitmap: Bitmap? = null
+    private var finalBitmapWithStyle: Bitmap? = null
 
     // Koin inject ViewModel
     private val viewModel: SegmentationAndStyleTransferViewModel by viewModel()
@@ -140,6 +141,13 @@ class SegmentationAndStyleTransferFragment : Fragment(),
                             .load(resultImage.styledImage)
                             .fitCenter()
                             .into(binding.imageViewStyled)*/
+
+                        // Set this to use with save functionn
+                        finalBitmapWithStyle = viewModel.cropBitmapWithMaskForStyle(
+                                resultImage.styledImage,
+                                outputBitmapFinal
+                        )
+
                         binding.imageviewStyled.setImageBitmap(
                                 viewModel.cropBitmapWithMaskForStyle(
                                         resultImage.styledImage,
@@ -175,6 +183,7 @@ class SegmentationAndStyleTransferFragment : Fragment(),
 
             Glide.with(imageview_input.context)
                     .load(photoFile)
+                    .fitCenter()
                     .into(imageview_input)
 
             // Make input ImageView visible
@@ -208,6 +217,7 @@ class SegmentationAndStyleTransferFragment : Fragment(),
 
             Glide.with(imageview_input.context)
                     .load(selfieBitmap)
+                    .fitCenter()
                     .into(imageview_input)
 
             // Make input ImageView visible
@@ -237,7 +247,11 @@ class SegmentationAndStyleTransferFragment : Fragment(),
     private fun updateUI(outputBitmap: Bitmap?, inferenceTime: Long) {
         progressbar.visibility = View.GONE
         imageview_input.visibility = View.INVISIBLE
-        imageview_output?.setImageBitmap(outputBitmap)
+        Glide.with(imageview_output.context)
+                .load(outputBitmap)
+                .fitCenter()
+                .into(imageview_output)
+        //imageview_output?.setImageBitmap(outputBitmap)
         inference_info.text = "Total process time: " + inferenceTime.toString() + "ms"
 
         //showStyledImage("mona.JPG")
@@ -264,7 +278,7 @@ class SegmentationAndStyleTransferFragment : Fragment(),
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_save -> saveImageToSDCard(finalBitmap)
+            R.id.action_save -> saveImageToSDCard(finalBitmapWithStyle)
         }
         return super.onOptionsItemSelected(item)
     }
@@ -275,7 +289,7 @@ class SegmentationAndStyleTransferFragment : Fragment(),
                 MainActivity.getOutputDirectory(requireContext()),
                 SimpleDateFormat(
                         FILENAME_FORMAT, Locale.US
-                ).format(System.currentTimeMillis()) + "_segmentation.jpg"
+                ).format(System.currentTimeMillis()) + "_segmentation_and_style_transfer.jpg"
         )
 
         ImageUtils.saveBitmap(bitmap, file)
