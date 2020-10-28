@@ -86,6 +86,7 @@ class StyleTransferModelExecutor(
         private const val STYLE_TRANSFER_FLOAT16_MODEL = "style_transfer_f16_384.tflite"
     }
 
+    // Function for ML Binding
     fun executeWithMLBinding(
             contentImagePath: Bitmap,
             styleImageName: String,
@@ -151,7 +152,7 @@ class StyleTransferModelExecutor(
     }
 
 
-    // NOT USED
+    // Function for interpreter
     fun executeWithInterpreter(
             contentImagePath: Bitmap,
             styleImageName: String,
