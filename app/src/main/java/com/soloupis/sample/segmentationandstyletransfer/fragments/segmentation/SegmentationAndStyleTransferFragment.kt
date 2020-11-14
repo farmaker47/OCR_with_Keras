@@ -16,11 +16,11 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.soloupis.sample.segmentationandstyletransfer.ImageUtils
 import com.soloupis.sample.segmentationandstyletransfer.MainActivity
 import com.soloupis.sample.segmentationandstyletransfer.R
 import com.soloupis.sample.segmentationandstyletransfer.databinding.FragmentSelfie2segmentationBinding
 import com.soloupis.sample.segmentationandstyletransfer.fragments.StyleFragment
+import com.soloupis.sample.segmentationandstyletransfer.utils.ImageUtils
 import kotlinx.android.synthetic.main.fragment_selfie2segmentation.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

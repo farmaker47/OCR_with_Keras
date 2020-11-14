@@ -24,6 +24,9 @@ import android.graphics.Matrix
 import android.graphics.RectF
 import android.media.ExifInterface
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -217,6 +220,21 @@ abstract class ImageUtils {
                 }
             }
             return styledImage
+        }
+
+        fun saveBitmap(bitmap: Bitmap?, file: File): String {
+
+            try {
+                val stream: OutputStream = FileOutputStream(file)
+                bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                stream.flush()
+                stream.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+
+            return file.absolutePath
+
         }
     }
 }
