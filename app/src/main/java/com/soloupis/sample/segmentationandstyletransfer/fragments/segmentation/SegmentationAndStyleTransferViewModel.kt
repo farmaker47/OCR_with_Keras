@@ -86,10 +86,9 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
             context: Context
     ) {
 
-        // Below use Standard interpreter or ML binding...uncomment at your choice
-        //******************************
+
         val result = styleTransferModelExecutor.executeWithMLBinding(contentBitmap, styleFilePath, context)
-        //******************************
+
         _totalTimeInference.postValue(result.totalExecutionTime.toInt())
         _styledBitmap.postValue(result)
         _inferenceDone.postValue(true)
