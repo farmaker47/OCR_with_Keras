@@ -110,7 +110,7 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
 
             // Run inference
             val tensorImage = TensorImage.fromBitmap(bitmap)
-            val results: List<Segmentation> = imageSegmenter.segment(tensorImage)
+            val results = imageSegmenter.segment(tensorImage)
             Log.i("LIST", results[0].toString())
             val result = results[0]
             val tensorMask = result.masks[0]
