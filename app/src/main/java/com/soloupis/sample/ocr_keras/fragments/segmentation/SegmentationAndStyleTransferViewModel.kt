@@ -13,9 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.get
-import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.vision.segmenter.ImageSegmenter
-import org.tensorflow.lite.task.vision.segmenter.OutputType
 import java.io.IOException
 
 class SegmentationAndStyleTransferViewModel(application: Application) :
@@ -24,6 +22,7 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
 
     private lateinit var imageSegmenter: ImageSegmenter
     private lateinit var scaledMaskBitmap: Bitmap
+    private lateinit var outputArray: IntArray
     var startTime: Long = 0L
     var inferenceTime = 0L
     lateinit var scaledBitmapObject: Bitmap
@@ -47,7 +46,7 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
     val inferenceDone: LiveData<Boolean>
         get() = _inferenceDone
 
-    val styleTransferModelExecutor: StyleTransferModelExecutor
+    val ocrModelExecutor: OcrModelExecutor
 
     init {
 
@@ -55,7 +54,7 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
 
         _currentList.addAll(application.assets.list("thumbnails")!!)
 
-        styleTransferModelExecutor = get()
+        ocrModelExecutor = get()
 
     }
 
@@ -73,9 +72,9 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
             styleFilePath: String
     ) {
 
-        viewModelScope.launch(Dispatchers.Default) {
+        /*viewModelScope.launch(Dispatchers.Default) {
             inferenceExecute(contentBitmap, styleFilePath, context)
-        }
+        }*/
     }
 
     private fun inferenceExecute(
@@ -85,60 +84,28 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
     ) {
 
 
-        val result = styleTransferModelExecutor.executeWithMLBinding(contentBitmap, styleFilePath, context)
+        /*val result = ocrModelExecutor.executeWithMLBinding(contentBitmap, styleFilePath, context)
 
         _totalTimeInference.postValue(result.totalExecutionTime.toInt())
         _styledBitmap.postValue(result)
-        _inferenceDone.postValue(true)
+        _inferenceDone.postValue(true)*/
     }
 
-    fun cropPersonFromPhoto(bitmap: Bitmap): Pair<Bitmap?, Long> {
+    fun performOcr(bitmap: Bitmap, context: Context): Pair<IntArray, Long> {
         try {
             // Initialization
             startTime = SystemClock.uptimeMillis()
-            val options =
-                    ImageSegmenter.ImageSegmenterOptions.builder()
-                            .setOutputType(OutputType.CATEGORY_MASK).build()
-            imageSegmenter =
-                    ImageSegmenter.createFromFileAndOptions(
-                            getApplication(),
-                            "lite-model_deeplabv3_1_metadata_2.tflite",
-                            options
-                    )
 
             // Run inference
-            val tensorImage = TensorImage.fromBitmap(bitmap)
-            val results = imageSegmenter.segment(tensorImage)
-            Log.i("LIST", results[0].toString())
-            val result = results[0]
-            val tensorMask = result.masks[0]
-            Log.i("RESULT", result.coloredLabels.toString())
-            val rawMask = tensorMask.tensorBuffer.intArray
-            Log.i("NUMBER", rawMask.size.toString())
-            Log.i("VALUES", rawMask.contentToString())
+            val result = ocrModelExecutor.executeOcrWithMLBinding(bitmap, context)
+            Log.e("RESULT", result.toString())
 
-            val output = Bitmap.createBitmap(
-                    tensorMask.width,
-                    tensorMask.height,
-                    Bitmap.Config.ARGB_8888
-            )
-            for (y in 0 until tensorMask.height) {
-                for (x in 0 until tensorMask.width) {
-                    output.setPixel(
-                            x,
-                            y,
-                            if (rawMask[y * tensorMask.width + x] == 0) Color.TRANSPARENT else Color.BLACK
-                    )
-                }
-            }
-            scaledMaskBitmap =
-                    Bitmap.createScaledBitmap(output, bitmap.getWidth(), bitmap.getHeight(), true)
             inferenceTime = SystemClock.uptimeMillis() - startTime
         } catch (e: IOException) {
-            Log.e("ImageSegmenter", "Error: ", e)
+            Log.e("Ocr", "Error: ", e)
         }
 
-        return Pair(cropBitmapWithMask(bitmap, scaledMaskBitmap), inferenceTime)
+        return Pair(outputArray, inferenceTime)
     }
 
 
@@ -198,7 +165,7 @@ class SegmentationAndStyleTransferViewModel(application: Application) :
 
     override fun onCleared() {
         super.onCleared()
-        styleTransferModelExecutor.close()
+        ocrModelExecutor.close()
     }
 
 }

@@ -37,8 +37,8 @@ import java.util.*
  * This is where we show both the captured input image and the output image
  */
 class SegmentationAndStyleTransferFragment : Fragment(),
-        SearchFragmentNavigationAdapter.SearchClickItemListener,
-        StyleFragment.OnListFragmentInteractionListener {
+    SearchFragmentNavigationAdapter.SearchClickItemListener,
+    StyleFragment.OnListFragmentInteractionListener {
 
     private val args: SegmentationAndStyleTransferFragmentArgs by navArgs()
     private lateinit var filePath: String
@@ -56,10 +56,13 @@ class SegmentationAndStyleTransferFragment : Fragment(),
     private lateinit var mSearchFragmentNavigationAdapter: SearchFragmentNavigationAdapter
 
     //
-    private lateinit var styleTransferModelExecutor: StyleTransferModelExecutor
+    private lateinit var ocrModelExecutor: OcrModelExecutor
 
     private lateinit var scaledBitmap: Bitmap
     private lateinit var selfieBitmap: Bitmap
+    private lateinit var loadedBitmap: Bitmap
+    private lateinit var outputArray: IntArray
+
     private var outputBitmapFinal: Bitmap? = null
     private var inferenceTime: Long = 0L
     private val stylesFragment: StyleFragment = StyleFragment()
@@ -74,8 +77,8 @@ class SegmentationAndStyleTransferFragment : Fragment(),
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentSelfie2segmentationBinding.inflate(inflater)
@@ -84,21 +87,21 @@ class SegmentationAndStyleTransferFragment : Fragment(),
 
         // RecyclerView setup
         mSearchFragmentNavigationAdapter =
-                SearchFragmentNavigationAdapter(
-                        requireActivity(),
-                        viewModel.currentList,
-                        this
-                )
+            SearchFragmentNavigationAdapter(
+                requireActivity(),
+                viewModel.currentList,
+                this
+            )
         binding.recyclerViewStyles.apply {
             setHasFixedSize(true)
             layoutManager =
-                    LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+                LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
             adapter = mSearchFragmentNavigationAdapter
 
         }
 
         // Initialize class with Koin
-        styleTransferModelExecutor = get()
+        ocrModelExecutor = get()
 
         getKoin().setProperty(getString(R.string.koinStyle), viewModel.stylename)
 
@@ -131,45 +134,45 @@ class SegmentationAndStyleTransferFragment : Fragment(),
     private fun observeViewModel() {
 
         viewModel.styledBitmap.observe(
-                requireActivity(),
-                Observer { resultImage ->
-                    if (resultImage != null) {
-                        /*Glide.with(activity!!)
-                            .load(resultImage.styledImage)
-                            .fitCenter()
-                            .into(binding.imageViewStyled)*/
+            requireActivity(),
+            Observer { resultImage ->
+                if (resultImage != null) {
+                    /*Glide.with(activity!!)
+                        .load(resultImage.styledImage)
+                        .fitCenter()
+                        .into(binding.imageViewStyled)*/
 
-                        // Set this to use with save function
-                        finalBitmapWithStyle = viewModel.cropBitmapWithMaskForStyle(
-                                resultImage.styledImage,
-                                outputBitmapFinal
+                    // Set this to use with save function
+                    finalBitmapWithStyle = viewModel.cropBitmapWithMaskForStyle(
+                        resultImage.styledImage,
+                        outputBitmapFinal
+                    )
+
+                    binding.imageviewStyled.setImageBitmap(
+                        viewModel.cropBitmapWithMaskForStyle(
+                            resultImage.styledImage,
+                            outputBitmapFinal
                         )
-
-                        binding.imageviewStyled.setImageBitmap(
-                                viewModel.cropBitmapWithMaskForStyle(
-                                        resultImage.styledImage,
-                                        outputBitmapFinal
-                                )
-                        )//selfieBitmap
-                    }
+                    )//selfieBitmap
                 }
+            }
         )
 
         // Observe style transfer procedure
         viewModel.inferenceDone.observe(
-                requireActivity(),
-                Observer { loadingDone ->
-                    when (loadingDone) {
-                        true -> binding.progressbarStyle.visibility = View.GONE
-                    }
+            requireActivity(),
+            Observer { loadingDone ->
+                when (loadingDone) {
+                    true -> binding.progressbarStyle.visibility = View.GONE
                 }
+            }
         )
 
         viewModel.totalTimeInference.observe(
-                requireActivity(),
-                Observer { time ->
-                    //binding.inferenceInfoStyle.text = "Total process time: ${time}ms"
-                }
+            requireActivity(),
+            Observer { time ->
+                //binding.inferenceInfoStyle.text = "Total process time: ${time}ms"
+            }
         )
     }
 
@@ -190,51 +193,58 @@ class SegmentationAndStyleTransferFragment : Fragment(),
             imageview_input.setImageBitmap(selfieBitmap)
 
             lifecycleScope.launch(Dispatchers.Default) {
-                val (outputBitmap, inferenceTime) = viewModel.cropPersonFromPhoto(selfieBitmap)
-                outputBitmapFinal = outputBitmap
+                val (intArray, inferenceTime) = viewModel.performOcr(
+                    selfieBitmap,
+                    requireActivity()
+                )
+                outputArray = intArray
                 withContext(Dispatchers.Main) {
 
                     // Make input ImageView gone
-                    binding.imageviewInput.visibility = View.GONE
+                    /*binding.imageviewInput.visibility = View.GONE
 
                     updateUI(outputBitmap, inferenceTime)
                     finalBitmap = outputBitmap
 
                     // Make output Image visible
-                    binding.imageviewOutput.visibility = View.VISIBLE
+                    binding.imageviewOutput.visibility = View.VISIBLE*/
 
                 }
             }
         } else {
 
-            selfieBitmap =
-                    BitmapFactory.decodeStream(
-                            requireActivity().contentResolver.openInputStream(
-                                    filePath.toUri()
-                            )
+            // When selecting image from gallery
+            loadedBitmap =
+                BitmapFactory.decodeStream(
+                    requireActivity().contentResolver.openInputStream(
+                        filePath.toUri()
                     )
+                )
 
             Glide.with(imageview_input.context)
-                    .load(selfieBitmap)
-                    .fitCenter()
-                    .into(imageview_input)
+                .load(loadedBitmap)
+                .fitCenter()
+                .into(imageview_input)
 
             // Make input ImageView visible
             binding.imageviewInput.visibility = View.VISIBLE
 
             lifecycleScope.launch(Dispatchers.Default) {
-                val (outputBitmap, inferenceTime) = viewModel.cropPersonFromPhoto(selfieBitmap)
-                outputBitmapFinal = outputBitmap
+                val (intArray, inferenceTime) = viewModel.performOcr(
+                    loadedBitmap,
+                    requireActivity()
+                )
+                outputArray = intArray
                 withContext(Dispatchers.Main) {
 
-                    // Make input ImageView gone
+                    /*// Make input ImageView gone
                     binding.imageviewInput.visibility = View.GONE
 
                     updateUI(outputBitmap, inferenceTime)
                     finalBitmap = outputBitmap
 
                     // Make output Image visible
-                    binding.imageviewOutput.visibility = View.VISIBLE
+                    binding.imageviewOutput.visibility = View.VISIBLE*/
 
                 }
             }
@@ -247,9 +257,9 @@ class SegmentationAndStyleTransferFragment : Fragment(),
         progressbar.visibility = View.GONE
         imageview_input.visibility = View.INVISIBLE
         Glide.with(imageview_output.context)
-                .load(outputBitmap)
-                .fitCenter()
-                .into(imageview_output)
+            .load(outputBitmap)
+            .fitCenter()
+            .into(imageview_output)
         //imageview_output?.setImageBitmap(outputBitmap)
         inference_info.text = "Total process time: " + inferenceTime.toString() + "ms"
 
@@ -260,7 +270,7 @@ class SegmentationAndStyleTransferFragment : Fragment(),
         lifecycleScope.launch(Dispatchers.Default) {
 
             viewModel.onApplyStyle(
-                    requireActivity(), scaledBitmap, style
+                requireActivity(), scaledBitmap, style
             )
         }
     }
@@ -285,15 +295,15 @@ class SegmentationAndStyleTransferFragment : Fragment(),
     private fun saveImageToSDCard(bitmap: Bitmap?): String {
 
         val file = File(
-                MainActivity.getOutputDirectory(requireContext()),
-                SimpleDateFormat(
-                        FILENAME_FORMAT, Locale.US
-                ).format(System.currentTimeMillis()) + "_segmentation_and_style_transfer.jpg"
+            MainActivity.getOutputDirectory(requireContext()),
+            SimpleDateFormat(
+                FILENAME_FORMAT, Locale.US
+            ).format(System.currentTimeMillis()) + "_segmentation_and_style_transfer.jpg"
         )
 
         ImageUtils.saveBitmap(bitmap, file)
         Toast.makeText(context, "saved to " + file.absolutePath.toString(), Toast.LENGTH_SHORT)
-                .show()
+            .show()
 
         return file.absolutePath
 
@@ -308,16 +318,16 @@ class SegmentationAndStyleTransferFragment : Fragment(),
 
     override fun onListItemClick(itemIndex: Int, sharedImage: ImageView?, type: String) {
 
-        // Upon click show rogress bar
+        // Upon click show progress bar
         binding.progressbarStyle.visibility = View.VISIBLE
         // make placeholder gone
         imageview_placeholder.visibility = View.GONE
 
         // Created scaled version of bitmap for model input.
         scaledBitmap = Bitmap.createScaledBitmap(
-                selfieBitmap,
-                MODEL_WIDTH,
-                MODEL_HEIGHT, true
+            selfieBitmap,
+            MODEL_WIDTH,
+            MODEL_HEIGHT, true
         )
 
         showStyledImage(type)
@@ -334,9 +344,9 @@ class SegmentationAndStyleTransferFragment : Fragment(),
         stylesFragment.dismiss()
 
         scaledBitmap = Bitmap.createScaledBitmap(
-                selfieBitmap,
-                MODEL_WIDTH,
-                MODEL_HEIGHT, true
+            selfieBitmap,
+            MODEL_WIDTH,
+            MODEL_HEIGHT, true
         )
 
         showStyledImage(item)

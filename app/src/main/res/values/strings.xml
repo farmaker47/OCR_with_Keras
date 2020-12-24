@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">S&amp;ST</string>
+    <string name="app_name">Keras OCR</string>
     <string name="about">"DeeplabV3 model"</string>
     <string name="tflite_model" translatable="false">TFLite Model:</string>
     <string name="share_button_alt">Share</string>
