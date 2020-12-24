@@ -31,22 +31,22 @@ import java.util.*
 
 /**
  * A simple [Fragment] subclass.
- * Use the [SegmentationAndStyleTransferFragment.newInstance] factory method to
+ * Use the [OcrFragment.newInstance] factory method to
  * create an instance of this fragment.
  *
  * This is where we show both the captured input image and the output image
  */
-class SegmentationAndStyleTransferFragment : Fragment(),
+class OcrFragment : Fragment(),
     SearchFragmentNavigationAdapter.SearchClickItemListener,
     StyleFragment.OnListFragmentInteractionListener {
 
-    private val args: SegmentationAndStyleTransferFragmentArgs by navArgs()
+    private val args: OcrFragmentArgs by navArgs()
     private lateinit var filePath: String
     private var finalBitmap: Bitmap? = null
     private var finalBitmapWithStyle: Bitmap? = null
 
     // Koin inject ViewModel
-    private val viewModel: SegmentationAndStyleTransferViewModel by viewModel()
+    private val viewModel: OcrViewModel by viewModel()
 
     // DataBinding
     private lateinit var binding: FragmentSelfie2segmentationBinding

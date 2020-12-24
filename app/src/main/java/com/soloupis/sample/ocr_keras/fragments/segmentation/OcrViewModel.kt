@@ -16,7 +16,7 @@ import org.koin.core.get
 import org.tensorflow.lite.task.vision.segmenter.ImageSegmenter
 import java.io.IOException
 
-class SegmentationAndStyleTransferViewModel(application: Application) :
+class OcrViewModel(application: Application) :
         AndroidViewModel(application),
         KoinComponent {
 
