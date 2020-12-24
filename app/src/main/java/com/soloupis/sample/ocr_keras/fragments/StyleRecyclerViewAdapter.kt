@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.soloupis.sample.segmentationandstyletransfer.fragments
+package com.soloupis.sample.ocr_keras.fragments
 
 import android.content.Context
 import android.net.Uri
@@ -24,7 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.soloupis.sample.segmentationandstyletransfer.R
+import com.soloupis.sample.ocr_keras.R
 
 /**
  * [StyleRecyclerViewAdapter] that can display a [StyleItem] and makes a call to the

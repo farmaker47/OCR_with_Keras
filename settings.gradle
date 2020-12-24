@@ -1,2 +1,2 @@
-rootProject.name='Segmentation_and_Style_Transfer'
+rootProject.name='ocr_keras'
 include ':app'

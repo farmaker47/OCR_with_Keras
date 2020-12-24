@@ -1,21 +1,14 @@
-package com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation
+package com.soloupis.sample.ocr_keras.fragments.segmentation
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.SystemClock
 import android.util.Log
-import com.soloupis.sample.segmentationandstyletransfer.ml.MagentaArbitraryImageStylizationV1256Fp16Prediction1
-import com.soloupis.sample.segmentationandstyletransfer.ml.MagentaArbitraryImageStylizationV1256Fp16Transfer1
-import com.soloupis.sample.segmentationandstyletransfer.utils.ImageUtils
-import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.gpu.CompatibilityList
-import org.tensorflow.lite.gpu.GpuDelegate
+import com.soloupis.sample.ocr_keras.ml.MagentaArbitraryImageStylizationV1256Fp16Prediction1
+import com.soloupis.sample.ocr_keras.ml.MagentaArbitraryImageStylizationV1256Fp16Transfer1
+import com.soloupis.sample.ocr_keras.utils.ImageUtils
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.model.Model
-import java.io.FileInputStream
-import java.io.IOException
-import java.nio.MappedByteBuffer
-import java.nio.channels.FileChannel
 
 data class ModelExecutionResult(
         val styledImage: Bitmap,

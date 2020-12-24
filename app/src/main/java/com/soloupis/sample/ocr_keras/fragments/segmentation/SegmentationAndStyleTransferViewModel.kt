@@ -1,4 +1,4 @@
-package com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation
+package com.soloupis.sample.ocr_keras.fragments.segmentation
 
 import android.app.Application
 import android.content.Context
@@ -13,11 +13,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.get
-import org.koin.core.inject
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.vision.segmenter.ImageSegmenter
 import org.tensorflow.lite.task.vision.segmenter.OutputType
-import org.tensorflow.lite.task.vision.segmenter.Segmentation
 import java.io.IOException
 
 class SegmentationAndStyleTransferViewModel(application: Application) :

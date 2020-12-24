@@ -1,4 +1,4 @@
-package com.soloupis.sample.segmentationandstyletransfer.fragments
+package com.soloupis.sample.ocr_keras.fragments
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
@@ -21,10 +21,10 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.soloupis.sample.segmentationandstyletransfer.MainActivity.Companion.getOutputDirectory
-import com.soloupis.sample.segmentationandstyletransfer.R
-import com.soloupis.sample.segmentationandstyletransfer.databinding.FragmentCameraBinding
-import com.soloupis.sample.segmentationandstyletransfer.utils.ImageUtils
+import com.soloupis.sample.ocr_keras.MainActivity.Companion.getOutputDirectory
+import com.soloupis.sample.ocr_keras.R
+import com.soloupis.sample.ocr_keras.databinding.FragmentCameraBinding
+import com.soloupis.sample.ocr_keras.utils.ImageUtils
 import kotlinx.android.synthetic.main.fragment_camera.*
 import java.io.File
 import java.text.SimpleDateFormat

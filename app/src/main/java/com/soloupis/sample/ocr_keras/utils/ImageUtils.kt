@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.soloupis.sample.segmentationandstyletransfer.utils
+package com.soloupis.sample.ocr_keras.utils
 
 import android.content.Context
 import android.graphics.Bitmap

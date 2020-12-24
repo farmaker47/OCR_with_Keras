@@ -1,11 +1,8 @@
-package com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation
+package com.soloupis.sample.ocr_keras.fragments.segmentation
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.Toast
@@ -16,11 +13,11 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.soloupis.sample.segmentationandstyletransfer.MainActivity
-import com.soloupis.sample.segmentationandstyletransfer.R
-import com.soloupis.sample.segmentationandstyletransfer.databinding.FragmentSelfie2segmentationBinding
-import com.soloupis.sample.segmentationandstyletransfer.fragments.StyleFragment
-import com.soloupis.sample.segmentationandstyletransfer.utils.ImageUtils
+import com.soloupis.sample.ocr_keras.MainActivity
+import com.soloupis.sample.ocr_keras.R
+import com.soloupis.sample.ocr_keras.databinding.FragmentSelfie2segmentationBinding
+import com.soloupis.sample.ocr_keras.fragments.StyleFragment
+import com.soloupis.sample.ocr_keras.utils.ImageUtils
 import kotlinx.android.synthetic.main.fragment_selfie2segmentation.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

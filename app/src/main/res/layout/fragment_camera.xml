@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/black"
-        tools:context="com.soloupis.sample.segmentationandstyletransfer.fragments.CameraFragment">
+        tools:context="com.soloupis.sample.ocr_keras.fragments.CameraFragment">
 
         <androidx.camera.view.PreviewView
             android:id="@+id/viewFinder"

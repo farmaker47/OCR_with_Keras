@@ -1,4 +1,4 @@
-package com.soloupis.sample.segmentationandstyletransfer.fragments
+package com.soloupis.sample.ocr_keras.fragments
 
 import android.Manifest
 import android.content.Context
@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import android.widget.Toast
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.navigation.fragment.findNavController
-import com.soloupis.sample.segmentationandstyletransfer.R
+import com.soloupis.sample.ocr_keras.R
 
 /**
  * A simple [Fragment] subclass that handles camera permission request

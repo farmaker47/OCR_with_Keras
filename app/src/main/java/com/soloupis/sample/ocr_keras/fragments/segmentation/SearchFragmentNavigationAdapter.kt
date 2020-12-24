@@ -1,4 +1,4 @@
-package com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation
+package com.soloupis.sample.ocr_keras.fragments.segmentation
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -9,10 +9,9 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.soloupis.sample.segmentationandstyletransfer.R
-import com.soloupis.sample.segmentationandstyletransfer.databinding.SearchFragmentAdapterBinding
+import com.soloupis.sample.ocr_keras.R
+import com.soloupis.sample.ocr_keras.databinding.SearchFragmentAdapterBinding
 import java.util.*
 
 

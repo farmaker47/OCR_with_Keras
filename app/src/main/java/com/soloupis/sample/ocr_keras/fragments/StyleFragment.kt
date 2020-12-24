@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.soloupis.sample.segmentationandstyletransfer.fragments
+package com.soloupis.sample.ocr_keras.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.soloupis.sample.segmentationandstyletransfer.R
+import com.soloupis.sample.ocr_keras.R
 
 /**
  * A fragment representing a list of available Styles to apply

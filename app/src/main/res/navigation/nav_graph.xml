@@ -9,7 +9,7 @@
     <!-- 1. Check camera permission -->
     <fragment
         android:id="@+id/permissions_fragment"
-        android:name="com.soloupis.sample.segmentationandstyletransfer.fragments.PermissionsFragment"
+        android:name="com.soloupis.sample.ocr_keras.fragments.PermissionsFragment"
         android:label="PermissionsFragment"
         tools:layout="@layout/fragment_camera">
 
@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/camera_fragment"
-        android:name="com.soloupis.sample.segmentationandstyletransfer.fragments.CameraFragment"
+        android:name="com.soloupis.sample.ocr_keras.fragments.CameraFragment"
         android:label="CameraFragment"
         tools:layout="@layout/fragment_camera">
 
@@ -42,7 +42,7 @@
     <!-- Display both original input and translated output images in UI -->
     <fragment
         android:id="@+id/selfie2segmentation_fragment"
-        android:name="com.soloupis.sample.segmentationandstyletransfer.fragments.segmentation.SegmentationAndStyleTransferFragment"
+        android:name="com.soloupis.sample.ocr_keras.fragments.segmentation.SegmentationAndStyleTransferFragment"
         android:label="Selfie2SegmentationFragment">
         <argument
             android:name="root_dir"
