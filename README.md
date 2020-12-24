@@ -1,1 +1,1 @@
-# Segmentation and Style Transfer Android App
+# Keras OCR application
