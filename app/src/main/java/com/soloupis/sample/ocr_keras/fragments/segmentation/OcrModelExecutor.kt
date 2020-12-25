@@ -1,35 +1,39 @@
 package com.soloupis.sample.ocr_keras.fragments.segmentation
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.graphics.*
 import android.os.SystemClock
 import android.util.Log
-import com.soloupis.sample.ocr_keras.ml.OcrFloat16Metadata
-import com.soloupis.sample.ocr_keras.utils.ImageUtils
+import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.gpu.GpuDelegate
+import org.tensorflow.lite.support.common.ops.NormalizeOp
+import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
-import org.tensorflow.lite.support.model.Model
+import org.tensorflow.lite.support.image.ops.ResizeOp
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.FileInputStream
 import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 
+
 data class ModelExecutionResult(
-        val styledImage: Bitmap,
-        val preProcessTime: Long = 0L,
-        val stylePredictTime: Long = 0L,
-        val styleTransferTime: Long = 0L,
-        val postProcessTime: Long = 0L,
-        val totalExecutionTime: Long = 0L,
-        val executionLog: String = "",
-        val errorMessage: String = ""
+    val intArray: Bitmap,
+    val preProcessTime: Long = 0L,
+    val stylePredictTime: Long = 0L,
+    val styleTransferTime: Long = 0L,
+    val postProcessTime: Long = 0L,
+    val totalExecutionTime: Long = 0L,
+    val executionLog: String = "",
+    val errorMessage: String = ""
 )
 
 @SuppressWarnings("GoodTime")
 class OcrModelExecutor(
-        context: Context,
-        private var useGPU: Boolean = false
+    context: Context,
+    private var useGPU: Boolean = false
 ) {
 
     private var numberThreads = 2
@@ -38,28 +42,9 @@ class OcrModelExecutor(
     private var stylePredictTime = 0L
     private var styleTransferTime = 0L
     private var postProcessTime = 0L
-    //private var modelMlBindingPredict: MagentaArbitraryImageStylizationV1256Fp16Prediction1
-    //private var modelMlBindingTransfer: MagentaArbitraryImageStylizationV1256Fp16Transfer1
-    private var ocrFloat16Metadata: OcrFloat16Metadata
     private val interpreterPredict: Interpreter
 
     init {
-
-        // ML binding set number of threads or GPU for accelerator
-        /*val compatList = CompatibilityList()
-        val options = if(compatList.isDelegateSupportedOnThisDevice) {
-            Log.d(TAG, "This device is GPU Compatible ")
-            Model.Options.Builder().setDevice(Model.Device.GPU).build()
-        } else {
-            Log.d(TAG, "This device is not GPU Incompatible ")
-            Model.Options.Builder().setNumThreads(4).build()
-        }*/
-
-        val options = Model.Options.Builder().setNumThreads(4).build()
-        //modelMlBindingPredict = MagentaArbitraryImageStylizationV1256Fp16Prediction1.newInstance(context, options)
-        //modelMlBindingTransfer = MagentaArbitraryImageStylizationV1256Fp16Transfer1.newInstance(context, options)
-
-        ocrFloat16Metadata = OcrFloat16Metadata.newInstance(context,options)
 
         // Interpreter
         interpreterPredict = getInterpreter(context, OCR_MODEL, false)
@@ -67,12 +52,11 @@ class OcrModelExecutor(
     }
 
     companion object {
-        private const val TAG = "StyleTransferMExec"
-        private const val STYLE_IMAGE_SIZE = 256
-        private const val CONTENT_IMAGE_SIZE = 384
-        private const val BOTTLENECK_SIZE = 100
+        private const val TAG = "OcrMExec"
+        private const val CONTENT_IMAGE_WIDTH = 31
+        private const val CONTENT_IMAGE_HEIGHT = 200
 
-        private const val OCR_MODEL = "ocr_float16.tflite"
+        private const val OCR_MODEL = "ocr_dr.tflite"
     }
 
     /*// Function for ML Binding
@@ -152,13 +136,70 @@ class OcrModelExecutor(
             preProcessTime = SystemClock.uptimeMillis()
             // Creates inputs for reference.
 
-            val loadedImage = TensorImage.fromBitmap(contentImage).tensorBuffer
+            // Create an ImageProcessor with all ops required. For more ops, please
+            // refer to the ImageProcessor Architecture.
+
+            // Create an ImageProcessor with all ops required. For more ops, please
+            // refer to the ImageProcessor Architecture.
+            val imageProcessor = ImageProcessor.Builder()
+                .add(
+                    ResizeOp(
+                        31,
+                        200,
+                        ResizeOp.ResizeMethod.BILINEAR
+                    )
+                )
+                .add(NormalizeOp(0f, 255.0f))
+                .build()
+
+            Log.i(TAG, "after imageProcessor")
+            // Create a TensorImage object. This creates the tensor of the corresponding
+            // tensor type (flot32 in this case) that the TensorFlow Lite interpreter needs.
+
+            // Create a TensorImage object. This creates the tensor of the corresponding
+            // tensor type (flot32 in this case) that the TensorFlow Lite interpreter needs.
+            var tImage = TensorImage(DataType.FLOAT32)
+
+            // Analysis code for every frame
+            // Preprocess the image
+
+            // Analysis code for every frame
+            // Preprocess the image
+            tImage.load(androidGrayScale(contentImage))
+            Log.i(TAG, "after loading")
+            tImage = imageProcessor.process(tImage)
+            Log.i(TAG, "after processing")
+
+            // Create a container for the result and specify that this is not a quantized model.
+            // Hence, the 'DataType' is defined as FLOAT32
+
+            // Create a container for the result and specify that this is not a quantized model.
+            // Hence, the 'DataType' is defined as float32
+            val probabilityBuffer = TensorBuffer.createFixedSize(
+                intArrayOf(1, 48),
+                DataType.FLOAT32
+            )
+            Log.i(TAG, "after probability buffer")
+
+
+            /*interpreterPredict.run(
+                ImageUtils.bitmapToByteBuffer(
+                    contentImage, CONTENT_IMAGE_WIDTH,
+                    CONTENT_IMAGE_HEIGHT
+                ), probabilityBuffer.buffer
+            )*/
+
+            interpreterPredict.run(tImage.buffer, probabilityBuffer.buffer)
+
+
+
+            Log.i(TAG, "after running")
+
             preProcessTime = SystemClock.uptimeMillis() - preProcessTime
 
             stylePredictTime = SystemClock.uptimeMillis()
 
-            // Runs model inference and gets result.
-            val outputsPredict = ocrFloat16Metadata.process(loadedImage)
+
             stylePredictTime = SystemClock.uptimeMillis() - stylePredictTime
 
             Log.i(TAG, "Predict Time to run: $stylePredictTime")
@@ -174,7 +215,7 @@ class OcrModelExecutor(
             fullExecutionTime = SystemClock.uptimeMillis() - fullExecutionTime
             Log.d(TAG, "Time to run everything: $fullExecutionTime")
 
-            return outputsPredict.arrayOutputAsTensorBuffer.intArray
+            return probabilityBuffer.intArray
         } catch (e: Exception) {
             val exceptionLog = "something went wrong: ${e.message}"
             Log.e("EXECUTOR", exceptionLog)
@@ -188,7 +229,7 @@ class OcrModelExecutor(
         }
     }
 
-    // Function for ML Binding
+    /*// Function for ML Binding
     fun executeOcrWithMLBinding(
         contentImage: Bitmap,
         context: Context
@@ -229,13 +270,43 @@ class OcrModelExecutor(
             val exceptionLog = "something went wrong: ${e.message}"
             Log.e("EXECUTOR", exceptionLog)
 
-            /*val emptyBitmap =
+            *//*val emptyBitmap =
                 ImageUtils.createEmptyBitmap(
                     CONTENT_IMAGE_SIZE,
                     CONTENT_IMAGE_SIZE
-                )*/
+                )*//*
             return intArrayOf()
         }
+    }
+
+    */
+
+    fun toGrayscale(bmpOriginal: Bitmap): Bitmap? {
+        val height: Int = bmpOriginal.height
+        val width: Int = bmpOriginal.width
+        val bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val c = Canvas(bmpGrayscale)
+        val paint = Paint()
+        val cm = ColorMatrix()
+        cm.setSaturation(0f)
+        val f = ColorMatrixColorFilter(cm)
+        paint.colorFilter = f
+        c.drawBitmap(bmpOriginal, 0f, 0f, paint)
+        return bmpGrayscale
+    }
+
+    private fun getByteBufferNormalized(bitmap: Bitmap): ByteBuffer? {
+        val width = bitmap.width
+        val height = bitmap.height
+        val mImgData: ByteBuffer = ByteBuffer
+            .allocateDirect(4 * width * height)
+        mImgData.order(ByteOrder.nativeOrder())
+        val pixels = IntArray(width * height)
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+        for (pixel in pixels) {
+            mImgData.putFloat(Color.red(pixel).toFloat() / 255.0f)
+        }
+        return mImgData
     }
 
     @Throws(IOException::class)
@@ -245,16 +316,6 @@ class OcrModelExecutor(
         useGpu: Boolean = false
     ): Interpreter {
         val tfliteOptions = Interpreter.Options()
-
-        // Use CPU threads or XNNPACK
-        //tfliteOptions.setNumThreads(numberThreads)
-        //tfliteOptions.setUseXNNPACK(true)
-
-        /*gpuDelegate = null
-        if (useGpu) {
-            gpuDelegate = GpuDelegate()
-            tfliteOptions.addDelegate(gpuDelegate)
-        }*/
 
         tfliteOptions.setNumThreads(numberThreads)
         return Interpreter(loadModelFile(context, modelName), tfliteOptions)
@@ -272,22 +333,24 @@ class OcrModelExecutor(
         return retFile
     }
 
-    private fun formatExecutionLog(): String {
-        val sb = StringBuilder()
-        sb.append("Input Image Size: $CONTENT_IMAGE_SIZE x $CONTENT_IMAGE_SIZE\n")
-        sb.append("GPU enabled: $useGPU\n")
-        sb.append("Number of threads: $numberThreads\n")
-        sb.append("Pre-process execution time: $preProcessTime ms\n")
-        sb.append("Predicting style execution time: $stylePredictTime ms\n")
-        sb.append("Transferring style execution time: $styleTransferTime ms\n")
-        sb.append("Post-process execution time: $postProcessTime ms\n")
-        sb.append("Full execution time: $fullExecutionTime ms\n")
-        return sb.toString()
+    private fun androidGrayScale(bmpOriginal: Bitmap): Bitmap? {
+        val width: Int
+        val height: Int
+        height = bmpOriginal.height
+        width = bmpOriginal.width
+        val bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bmpGrayscale)
+        val paint = Paint()
+        val colorMatrix = ColorMatrix()
+        colorMatrix.setSaturation(0f)
+        val colorMatrixFilter = ColorMatrixColorFilter(colorMatrix)
+        paint.colorFilter = colorMatrixFilter
+        canvas.drawBitmap(bmpOriginal, 0f, 0f, paint)
+        return bmpGrayscale
     }
 
+
     fun close() {
-        //modelMlBindingPredict.close()
-        //modelMlBindingTransfer.close()
-        ocrFloat16Metadata.close()
+        interpreterPredict.close()
     }
 }

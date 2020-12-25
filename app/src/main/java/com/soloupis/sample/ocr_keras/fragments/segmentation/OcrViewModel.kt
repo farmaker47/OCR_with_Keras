@@ -97,8 +97,8 @@ class OcrViewModel(application: Application) :
             startTime = SystemClock.uptimeMillis()
 
             // Run inference
-            val result = ocrModelExecutor.executeOcrWithMLBinding(bitmap, context)
-            Log.e("RESULT", result.toString())
+            val result = ocrModelExecutor.executeOcrWithInterpreter(bitmap, context)
+            Log.e("RESULT", result.contentToString())
 
             inferenceTime = SystemClock.uptimeMillis() - startTime
         } catch (e: IOException) {

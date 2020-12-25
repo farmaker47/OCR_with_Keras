@@ -143,17 +143,15 @@ class OcrFragment : Fragment(),
                         .into(binding.imageViewStyled)*/
 
                     // Set this to use with save function
-                    finalBitmapWithStyle = viewModel.cropBitmapWithMaskForStyle(
-                        resultImage.styledImage,
+                    /*finalBitmapWithStyle = viewModel.cropBitmapWithMaskForStyle(
                         outputBitmapFinal
-                    )
+                    )*/
 
-                    binding.imageviewStyled.setImageBitmap(
+                    /*binding.imageviewStyled.setImageBitmap(
                         viewModel.cropBitmapWithMaskForStyle(
-                            resultImage.styledImage,
                             outputBitmapFinal
                         )
-                    )//selfieBitmap
+                    )*///selfieBitmap
                 }
             }
         )
