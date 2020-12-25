@@ -4,12 +4,16 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.SystemClock
 import android.util.Log
-import com.soloupis.sample.ocr_keras.ml.MagentaArbitraryImageStylizationV1256Fp16Prediction1
-import com.soloupis.sample.ocr_keras.ml.MagentaArbitraryImageStylizationV1256Fp16Transfer1
 import com.soloupis.sample.ocr_keras.ml.OcrFloat16Metadata
 import com.soloupis.sample.ocr_keras.utils.ImageUtils
+import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.gpu.GpuDelegate
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.model.Model
+import java.io.FileInputStream
+import java.io.IOException
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
 
 data class ModelExecutionResult(
         val styledImage: Bitmap,
@@ -28,7 +32,7 @@ class OcrModelExecutor(
         private var useGPU: Boolean = false
 ) {
 
-    private var numberThreads = 4
+    private var numberThreads = 2
     private var fullExecutionTime = 0L
     private var preProcessTime = 0L
     private var stylePredictTime = 0L
@@ -37,6 +41,7 @@ class OcrModelExecutor(
     //private var modelMlBindingPredict: MagentaArbitraryImageStylizationV1256Fp16Prediction1
     //private var modelMlBindingTransfer: MagentaArbitraryImageStylizationV1256Fp16Transfer1
     private var ocrFloat16Metadata: OcrFloat16Metadata
+    private val interpreterPredict: Interpreter
 
     init {
 
@@ -56,6 +61,9 @@ class OcrModelExecutor(
 
         ocrFloat16Metadata = OcrFloat16Metadata.newInstance(context,options)
 
+        // Interpreter
+        interpreterPredict = getInterpreter(context, OCR_MODEL, false)
+
     }
 
     companion object {
@@ -63,6 +71,8 @@ class OcrModelExecutor(
         private const val STYLE_IMAGE_SIZE = 256
         private const val CONTENT_IMAGE_SIZE = 384
         private const val BOTTLENECK_SIZE = 100
+
+        private const val OCR_MODEL = "ocr_float16.tflite"
     }
 
     /*// Function for ML Binding
@@ -129,6 +139,54 @@ class OcrModelExecutor(
             )
         }
     }*/
+    // Function for Interpreter
+    fun executeOcrWithInterpreter(
+        contentImage: Bitmap,
+        context: Context
+    ): IntArray {
+        try {
+            Log.i(TAG, "running models")
+
+            fullExecutionTime = SystemClock.uptimeMillis()
+
+            preProcessTime = SystemClock.uptimeMillis()
+            // Creates inputs for reference.
+
+            val loadedImage = TensorImage.fromBitmap(contentImage).tensorBuffer
+            preProcessTime = SystemClock.uptimeMillis() - preProcessTime
+
+            stylePredictTime = SystemClock.uptimeMillis()
+
+            // Runs model inference and gets result.
+            val outputsPredict = ocrFloat16Metadata.process(loadedImage)
+            stylePredictTime = SystemClock.uptimeMillis() - stylePredictTime
+
+            Log.i(TAG, "Predict Time to run: $stylePredictTime")
+
+            styleTransferTime = SystemClock.uptimeMillis()
+            // Runs model inference and gets result.
+            styleTransferTime = SystemClock.uptimeMillis() - styleTransferTime
+            Log.d(TAG, "Style apply Time to run: $styleTransferTime")
+
+            postProcessTime = SystemClock.uptimeMillis()
+            postProcessTime = SystemClock.uptimeMillis() - postProcessTime
+
+            fullExecutionTime = SystemClock.uptimeMillis() - fullExecutionTime
+            Log.d(TAG, "Time to run everything: $fullExecutionTime")
+
+            return outputsPredict.arrayOutputAsTensorBuffer.intArray
+        } catch (e: Exception) {
+            val exceptionLog = "something went wrong: ${e.message}"
+            Log.e("EXECUTOR", exceptionLog)
+
+            /*val emptyBitmap =
+                ImageUtils.createEmptyBitmap(
+                    CONTENT_IMAGE_SIZE,
+                    CONTENT_IMAGE_SIZE
+                )*/
+            return intArrayOf()
+        }
+    }
 
     // Function for ML Binding
     fun executeOcrWithMLBinding(
@@ -178,6 +236,40 @@ class OcrModelExecutor(
                 )*/
             return intArrayOf()
         }
+    }
+
+    @Throws(IOException::class)
+    private fun getInterpreter(
+        context: Context,
+        modelName: String,
+        useGpu: Boolean = false
+    ): Interpreter {
+        val tfliteOptions = Interpreter.Options()
+
+        // Use CPU threads or XNNPACK
+        //tfliteOptions.setNumThreads(numberThreads)
+        //tfliteOptions.setUseXNNPACK(true)
+
+        /*gpuDelegate = null
+        if (useGpu) {
+            gpuDelegate = GpuDelegate()
+            tfliteOptions.addDelegate(gpuDelegate)
+        }*/
+
+        tfliteOptions.setNumThreads(numberThreads)
+        return Interpreter(loadModelFile(context, modelName), tfliteOptions)
+    }
+
+    @Throws(IOException::class)
+    private fun loadModelFile(context: Context, modelFile: String): MappedByteBuffer {
+        val fileDescriptor = context.assets.openFd(modelFile)
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val fileChannel = inputStream.channel
+        val startOffset = fileDescriptor.startOffset
+        val declaredLength = fileDescriptor.declaredLength
+        val retFile = fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+        fileDescriptor.close()
+        return retFile
     }
 
     private fun formatExecutionLog(): String {
