@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.os.SystemClock
 import android.util.Log
+import com.soloupis.sample.ocr_keras.utils.ImageUtils
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.ops.NormalizeOp
@@ -127,17 +128,11 @@ class OcrModelExecutor(
     fun executeOcrWithInterpreter(
         contentImage: Bitmap,
         context: Context
-    ): IntArray {
+    ): LongArray {
         try {
             Log.i(TAG, "running models")
 
             fullExecutionTime = SystemClock.uptimeMillis()
-
-            preProcessTime = SystemClock.uptimeMillis()
-            // Creates inputs for reference.
-
-            // Create an ImageProcessor with all ops required. For more ops, please
-            // refer to the ImageProcessor Architecture.
 
             // Create an ImageProcessor with all ops required. For more ops, please
             // refer to the ImageProcessor Architecture.
@@ -153,15 +148,10 @@ class OcrModelExecutor(
                 .build()
 
             Log.i(TAG, "after imageProcessor")
-            // Create a TensorImage object. This creates the tensor of the corresponding
-            // tensor type (flot32 in this case) that the TensorFlow Lite interpreter needs.
 
             // Create a TensorImage object. This creates the tensor of the corresponding
             // tensor type (flot32 in this case) that the TensorFlow Lite interpreter needs.
             var tImage = TensorImage(DataType.FLOAT32)
-
-            // Analysis code for every frame
-            // Preprocess the image
 
             // Analysis code for every frame
             // Preprocess the image
@@ -171,14 +161,14 @@ class OcrModelExecutor(
             Log.i(TAG, "after processing")
 
             // Create a container for the result and specify that this is not a quantized model.
-            // Hence, the 'DataType' is defined as FLOAT32
-
-            // Create a container for the result and specify that this is not a quantized model.
             // Hence, the 'DataType' is defined as float32
-            val probabilityBuffer = TensorBuffer.createFixedSize(
+            /*val probabilityBuffer = TensorBuffer.createFixedSize(
                 intArrayOf(1, 48),
-                DataType.FLOAT32
-            )
+                DataType.INT64
+            )*/
+            //val outputs = HashMap<Int, Any>()
+            val arrayOutputs = Array(1) { LongArray(48) { 0 } }
+            //outputs[0]=arrayOutputs
             Log.i(TAG, "after probability buffer")
 
 
@@ -189,43 +179,27 @@ class OcrModelExecutor(
                 ), probabilityBuffer.buffer
             )*/
 
-            interpreterPredict.run(tImage.buffer, probabilityBuffer.buffer)
+            interpreterPredict.run(
+                ImageUtils.bitmapToByteBufferGray(
+                    contentImage,
+                    CONTENT_IMAGE_WIDTH, CONTENT_IMAGE_HEIGHT
+                ), arrayOutputs
+            )
 
 
 
             Log.i(TAG, "after running")
 
-            preProcessTime = SystemClock.uptimeMillis() - preProcessTime
-
-            stylePredictTime = SystemClock.uptimeMillis()
-
-
-            stylePredictTime = SystemClock.uptimeMillis() - stylePredictTime
-
-            Log.i(TAG, "Predict Time to run: $stylePredictTime")
-
-            styleTransferTime = SystemClock.uptimeMillis()
-            // Runs model inference and gets result.
-            styleTransferTime = SystemClock.uptimeMillis() - styleTransferTime
-            Log.d(TAG, "Style apply Time to run: $styleTransferTime")
-
-            postProcessTime = SystemClock.uptimeMillis()
-            postProcessTime = SystemClock.uptimeMillis() - postProcessTime
-
             fullExecutionTime = SystemClock.uptimeMillis() - fullExecutionTime
-            Log.d(TAG, "Time to run everything: $fullExecutionTime")
+            Log.i(TAG, "Time to run everything: $fullExecutionTime")
 
-            return probabilityBuffer.intArray
+            return arrayOutputs[0]
         } catch (e: Exception) {
+
             val exceptionLog = "something went wrong: ${e.message}"
             Log.e("EXECUTOR", exceptionLog)
 
-            /*val emptyBitmap =
-                ImageUtils.createEmptyBitmap(
-                    CONTENT_IMAGE_SIZE,
-                    CONTENT_IMAGE_SIZE
-                )*/
-            return intArrayOf()
+            return longArrayOf()
         }
     }
 
