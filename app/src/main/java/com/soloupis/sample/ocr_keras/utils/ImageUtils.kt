@@ -209,9 +209,10 @@ abstract class ImageUtils {
                     // Normalize channel values to [-1.0, 1.0]. This requirement varies by
                     // model. For example, some models might require values to be normalized
                     // to the range [0.0, 1.0] instead.
-                    //inputImage.putFloat(((value shr 16 and 0xFF) - mean) / std)
-                    //inputImage.putFloat(((value shr 8 and 0xFF) - mean) / std)
-                    inputImage.putFloat(((value and 0xFF) - mean) / std)
+
+                    //inputImage.putFloat(((value shr 16 and 0xFF) - mean) / std)  // RED
+                    //inputImage.putFloat(((value shr 8 and 0xFF) - mean) / std)   // GREEN
+                    inputImage.putFloat(((value and 0xFF) - mean) / std)     // BLUE
                 }
             }
 

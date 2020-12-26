@@ -37,7 +37,7 @@ class OcrModelExecutor(
     private var useGPU: Boolean = false
 ) {
 
-    private var numberThreads = 2
+    private var numberThreads = 7
     private var fullExecutionTime = 0L
     private var preProcessTime = 0L
     private var stylePredictTime = 0L
@@ -54,8 +54,8 @@ class OcrModelExecutor(
 
     companion object {
         private const val TAG = "OcrMExec"
-        private const val CONTENT_IMAGE_WIDTH = 31
-        private const val CONTENT_IMAGE_HEIGHT = 200
+        private const val CONTENT_IMAGE_WIDTH = 200
+        private const val CONTENT_IMAGE_HEIGHT = 31
 
         private const val OCR_MODEL = "ocr_dr.tflite"
     }
@@ -180,13 +180,8 @@ class OcrModelExecutor(
             )*/
 
             interpreterPredict.run(
-                ImageUtils.bitmapToByteBufferGray(
-                    contentImage,
-                    CONTENT_IMAGE_WIDTH, CONTENT_IMAGE_HEIGHT
-                ), arrayOutputs
+                getByteBufferNormalized(androidGrayScale(contentImage)), arrayOutputs
             )
-
-
 
             Log.i(TAG, "after running")
 
@@ -255,30 +250,16 @@ class OcrModelExecutor(
 
     */
 
-    fun toGrayscale(bmpOriginal: Bitmap): Bitmap? {
-        val height: Int = bmpOriginal.height
-        val width: Int = bmpOriginal.width
-        val bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val c = Canvas(bmpGrayscale)
-        val paint = Paint()
-        val cm = ColorMatrix()
-        cm.setSaturation(0f)
-        val f = ColorMatrixColorFilter(cm)
-        paint.colorFilter = f
-        c.drawBitmap(bmpOriginal, 0f, 0f, paint)
-        return bmpGrayscale
-    }
-
-    private fun getByteBufferNormalized(bitmap: Bitmap): ByteBuffer? {
+    private fun getByteBufferNormalized(bitmapIn: Bitmap): ByteBuffer? {
+        val bitmap = Bitmap.createScaledBitmap(bitmapIn, CONTENT_IMAGE_WIDTH, CONTENT_IMAGE_HEIGHT, true)
         val width = bitmap.width
         val height = bitmap.height
-        val mImgData: ByteBuffer = ByteBuffer
-            .allocateDirect(4 * width * height)
+        val mImgData: ByteBuffer = ByteBuffer.allocateDirect(4 * width * height)
         mImgData.order(ByteOrder.nativeOrder())
         val pixels = IntArray(width * height)
         bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
         for (pixel in pixels) {
-            mImgData.putFloat(Color.red(pixel).toFloat() / 255.0f)
+            mImgData.putFloat(Color.blue(pixel).toFloat() / 255.0f)
         }
         return mImgData
     }
@@ -292,6 +273,9 @@ class OcrModelExecutor(
         val tfliteOptions = Interpreter.Options()
 
         tfliteOptions.setNumThreads(numberThreads)
+        //tfliteOptions.setUseNNAPI(true)     //846ms
+        //tfliteOptions.setUseXNNPACK(true) //     Caused by: java.lang.IllegalArgumentException: Internal error: Failed to apply XNNPACK delegate:
+                                            //     Attempting to use a delegate that only supports static-sized tensors with a graph that has dynamic-sized tensors.
         return Interpreter(loadModelFile(context, modelName), tfliteOptions)
     }
 
@@ -307,7 +291,7 @@ class OcrModelExecutor(
         return retFile
     }
 
-    private fun androidGrayScale(bmpOriginal: Bitmap): Bitmap? {
+    private fun androidGrayScale(bmpOriginal: Bitmap): Bitmap {
         val width: Int
         val height: Int
         height = bmpOriginal.height
