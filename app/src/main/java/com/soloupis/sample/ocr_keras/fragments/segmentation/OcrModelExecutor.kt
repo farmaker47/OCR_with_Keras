@@ -4,18 +4,17 @@ import android.content.Context
 import android.graphics.*
 import android.os.SystemClock
 import android.util.Log
-import com.soloupis.sample.ocr_keras.utils.ImageUtils
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
-import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.IntBuffer
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 
@@ -155,13 +154,45 @@ class OcrModelExecutor(
 
             // Analysis code for every frame
             // Preprocess the image
+
             tImage.load(androidGrayScale(contentImage))
+            /*val bitmap = BitmapFactory.decodeByteArray(
+                bufferToByteArray(
+                    getByteBufferNormalized(
+                        androidGrayScale(
+                            contentImage
+                        )
+                    )
+                ), 0, bufferToByteArray(
+                    getByteBufferNormalized(
+                        androidGrayScale(
+                            contentImage
+                        )
+                    )
+                ).size
+            )
+            tImage.load(bitmap)*/
+            /*tImage.load(
+                TensorBuffer.create (
+                    byteArrayToIntArray(
+                        bufferToByteArray(
+                            getByteBufferNormalized(
+                                androidGrayScale(
+                                    contentImage
+                                )
+                            )
+                        )
+                    ), DataType.FLOAT32
+                )
+            )*/
             Log.i(TAG, "after loading")
             tImage = imageProcessor.process(tImage)
             Log.i(TAG, "after processing")
 
             // Create a container for the result and specify that this is not a quantized model.
             // Hence, the 'DataType' is defined as float32
+
+
             /*val probabilityBuffer = TensorBuffer.createFixedSize(
                 intArrayOf(1, 48),
                 DataType.INT64
@@ -183,6 +214,8 @@ class OcrModelExecutor(
                 getByteBufferNormalized(androidGrayScale(contentImage)), arrayOutputs
             )
 
+            //interpreterPredict.run(tImage.buffer, arrayOutputs)
+
             Log.i(TAG, "after running")
 
             fullExecutionTime = SystemClock.uptimeMillis() - fullExecutionTime
@@ -197,6 +230,34 @@ class OcrModelExecutor(
             return longArrayOf()
         }
     }
+
+    /*private fun getBitmap(buffer: ByteBuffer, width: Int, height: Int): Bitmap {
+        buffer.rewind()
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        bitmap.copyPixelsFromBuffer(buffer)
+        return bitmap
+    }
+
+    private fun bufferToByteArray(buffer: ByteBuffer): ByteArray {
+
+        buffer.rewind()
+        val arr = ByteArray(buffer.remaining())
+        buffer.get(arr)
+        //buffer.array()
+
+        return arr
+    }
+
+    private fun byteArrayToIntArray(byteArray: ByteArray): IntArray {
+
+        val intBuf: IntBuffer = ByteBuffer.wrap(byteArray)
+            .order(ByteOrder.BIG_ENDIAN)
+            .asIntBuffer()
+        val array = IntArray(intBuf.remaining())
+        intBuf.get(array)
+
+        return array
+    }*/
 
     /*// Function for ML Binding
     fun executeOcrWithMLBinding(
@@ -250,8 +311,13 @@ class OcrModelExecutor(
 
     */
 
-    private fun getByteBufferNormalized(bitmapIn: Bitmap): ByteBuffer? {
-        val bitmap = Bitmap.createScaledBitmap(bitmapIn, CONTENT_IMAGE_WIDTH, CONTENT_IMAGE_HEIGHT, true)
+    private fun getByteBufferNormalized(bitmapIn: Bitmap): ByteBuffer {
+        val bitmap = Bitmap.createScaledBitmap(
+            bitmapIn,
+            CONTENT_IMAGE_WIDTH,
+            CONTENT_IMAGE_HEIGHT,
+            true
+        )
         val width = bitmap.width
         val height = bitmap.height
         val mImgData: ByteBuffer = ByteBuffer.allocateDirect(4 * width * height)
@@ -275,7 +341,7 @@ class OcrModelExecutor(
         tfliteOptions.setNumThreads(numberThreads)
         //tfliteOptions.setUseNNAPI(true)     //846ms
         //tfliteOptions.setUseXNNPACK(true) //     Caused by: java.lang.IllegalArgumentException: Internal error: Failed to apply XNNPACK delegate:
-                                            //     Attempting to use a delegate that only supports static-sized tensors with a graph that has dynamic-sized tensors.
+        //     Attempting to use a delegate that only supports static-sized tensors with a graph that has dynamic-sized tensors.
         return Interpreter(loadModelFile(context, modelName), tfliteOptions)
     }
 
