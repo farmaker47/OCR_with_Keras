@@ -191,6 +191,7 @@ class OcrFragment : Fragment(),
             selfieBitmap = BitmapFactory.decodeFile(filePath)
             imageview_input.setImageBitmap(selfieBitmap)
 
+
             lifecycleScope.launch(Dispatchers.Default) {
                 val (longArray, inferenceTime) = viewModel.performOcr(
                     loadedBitmap,
