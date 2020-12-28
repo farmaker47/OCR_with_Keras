@@ -3,6 +3,7 @@ package com.soloupis.sample.ocr_keras.fragments.segmentation
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.Toast
@@ -61,7 +62,7 @@ class OcrFragment : Fragment(),
     private lateinit var scaledBitmap: Bitmap
     private lateinit var selfieBitmap: Bitmap
     private lateinit var loadedBitmap: Bitmap
-    private lateinit var outputArray: IntArray
+    private lateinit var outputArray: LongArray
 
     private var outputBitmapFinal: Bitmap? = null
     private var inferenceTime: Long = 0L
@@ -228,11 +229,14 @@ class OcrFragment : Fragment(),
             binding.imageviewInput.visibility = View.VISIBLE
 
             lifecycleScope.launch(Dispatchers.Default) {
-                val (intArray, inferenceTime) = viewModel.performOcr(
+                val (longArray, inferenceTime) = viewModel.performOcr(
                     loadedBitmap,
                     requireActivity()
                 )
-                outputArray = intArray
+                outputArray = longArray
+                Log.e("RESULT", outputArray.contentToString())
+
+
                 withContext(Dispatchers.Main) {
 
                     /*// Make input ImageView gone
