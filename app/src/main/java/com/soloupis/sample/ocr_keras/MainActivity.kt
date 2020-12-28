@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity(),
             findNavController(R.id.fragment_container).navigate(action)
         }
 
-        //test file
     }
 
     companion object {
