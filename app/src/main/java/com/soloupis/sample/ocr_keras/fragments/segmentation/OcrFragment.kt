@@ -192,11 +192,12 @@ class OcrFragment : Fragment(),
             imageview_input.setImageBitmap(selfieBitmap)
 
             lifecycleScope.launch(Dispatchers.Default) {
-                val (intArray, inferenceTime) = viewModel.performOcr(
-                    selfieBitmap,
+                val (longArray, inferenceTime) = viewModel.performOcr(
+                    loadedBitmap,
                     requireActivity()
                 )
-                outputArray = intArray
+                outputArray = longArray
+                Log.e("RESULT", outputArray.contentToString())
                 withContext(Dispatchers.Main) {
 
                     // Make input ImageView gone
