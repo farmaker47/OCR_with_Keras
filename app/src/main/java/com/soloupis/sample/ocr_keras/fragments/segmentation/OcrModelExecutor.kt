@@ -7,9 +7,11 @@ import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.ops.NormalizeOp
+import org.tensorflow.lite.support.image.ColorSpaceType
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -151,11 +153,15 @@ class OcrModelExecutor(
             // Create a TensorImage object. This creates the tensor of the corresponding
             // tensor type (flot32 in this case) that the TensorFlow Lite interpreter needs.
             var tImage = TensorImage(DataType.FLOAT32)
+            //var buf = TensorBuffer.createDynamic(DataType.FLOAT32)
 
             // Analysis code for every frame
             // Preprocess the image
 
             tImage.load(androidGrayScale(contentImage))
+
+
+            //tImage.load(buf,ColorSpaceType.GRAYSCALE)
             /*val bitmap = BitmapFactory.decodeByteArray(
                 bufferToByteArray(
                     getByteBufferNormalized(
@@ -173,7 +179,7 @@ class OcrModelExecutor(
             )
             tImage.load(bitmap)*/
             /*tImage.load(
-                TensorBuffer.create (
+                TensorBuffer.createFixedSize(
                     byteArrayToIntArray(
                         bufferToByteArray(
                             getByteBufferNormalized(
@@ -183,7 +189,7 @@ class OcrModelExecutor(
                             )
                         )
                     ), DataType.FLOAT32
-                )
+                ), ColorSpaceType.GRAYSCALE
             )*/
             Log.i(TAG, "after loading")
             tImage = imageProcessor.process(tImage)
