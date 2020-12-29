@@ -18,7 +18,7 @@ import java.util.*
 class SearchFragmentNavigationAdapter(
         val mContext: Context,
         private var hitsList: ArrayList<String>?,
-        private val mSearchClickItemListener: SearchClickItemListener
+        internal val searchClickItemListener: SearchClickItemListener
 ) :
         RecyclerView.Adapter<SearchFragmentNavigationAdapter.NavigationAdapterViewHolder>() {
 
@@ -63,7 +63,7 @@ class SearchFragmentNavigationAdapter(
 
         override fun onClick(view: View) {
             val clickedPosition = adapterPosition
-            mSearchClickItemListener.onListItemClick(
+            searchClickItemListener.onListItemClick(
                     clickedPosition,
                     binding.imageFragmentAdapter,
                     hitsList!![clickedPosition]

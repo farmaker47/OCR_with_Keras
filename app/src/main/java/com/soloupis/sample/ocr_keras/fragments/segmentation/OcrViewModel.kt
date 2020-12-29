@@ -8,9 +8,6 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.get
 import org.tensorflow.lite.task.vision.segmenter.ImageSegmenter
@@ -27,7 +24,6 @@ class OcrViewModel(application: Application) :
     var inferenceTime = 0L
     lateinit var scaledBitmapObject: Bitmap
 
-    var stylename = String()
     var seekBarProgress: Float = 0F
 
     private var _currentList: ArrayList<String> = ArrayList()
@@ -50,31 +46,25 @@ class OcrViewModel(application: Application) :
 
     init {
 
-        stylename = "mona.JPG"
-
         _currentList.addAll(application.assets.list("thumbnails")!!)
 
         ocrModelExecutor = get()
 
     }
 
-    fun setStyleName(string: String) {
-        stylename = string
-    }
-
     fun setTheSeekBarProgress(progress: Float) {
         seekBarProgress = progress
     }
 
-    fun onApplyStyle(
+    fun onClickPerformOcr(
             context: Context,
-            contentBitmap: Bitmap,
             styleFilePath: String
-    ) {
+    ): Pair<LongArray, Long> {
 
         /*viewModelScope.launch(Dispatchers.Default) {
             inferenceExecute(contentBitmap, styleFilePath, context)
         }*/
+        return performOcrWithImage(styleFilePath,context)
     }
 
     private fun inferenceExecute(
@@ -108,60 +98,27 @@ class OcrViewModel(application: Application) :
         return Pair(outputArray, inferenceTime)
     }
 
+    fun performOcrWithImage(thumbnailsImageName: String, context: Context): Pair<LongArray, Long> {
+        try {
+            // Initialization
+            startTime = SystemClock.uptimeMillis()
 
-    fun cropBitmapWithMask(original: Bitmap, mask: Bitmap?): Bitmap? {
-        if (mask == null
-        ) {
-            return null
-        }
-        Log.i("ORIGINAL_WIDTH", original.width.toString())
-        Log.i("ORIGINAL_HEIGHT", original.height.toString())
-        Log.i("MASK_WIDTH", original.width.toString())
-        Log.i("MASK_HEIGHT", original.height.toString())
-        val w = original.width
-        val h = original.height
-        if (w <= 0 || h <= 0) {
-            return null
-        }
-        val cropped: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        Log.i("CROPPED_WIDTH", cropped.width.toString())
-        Log.i("CROPPED_HEIGHT", cropped.height.toString())
-        val canvas = Canvas(cropped)
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
-        canvas.drawBitmap(original, 0f, 0f, null)
-        canvas.drawBitmap(mask, 0f, 0f, paint)
-        paint.xfermode = null
+            // Run inference
+            val result = ocrModelExecutor.executeOcrWithInterpreter(getBitmapFromAsset(context,"thumbnails/$thumbnailsImageName"), context)
+            outputArray = result
 
-        return cropped
+            inferenceTime = SystemClock.uptimeMillis() - startTime
+
+        } catch (e: IOException) {
+            Log.e("Ocr", "Error: ", e)
+        }
+
+        return Pair(outputArray, inferenceTime)
     }
 
-    fun cropBitmapWithMaskForStyle(original: Bitmap, mask: Bitmap?): Bitmap? {
-        if (mask == null
-        ) {
-            return null
-        }
-        val w = original.width
-        val h = original.height
-        if (w <= 0 || h <= 0) {
-            return null
-        }
+    private fun getBitmapFromAsset(context: Context, path: String): Bitmap =
+            context.assets.open(path).use { BitmapFactory.decodeStream(it) }
 
-        val scaledBitmap = Bitmap.createScaledBitmap(
-                mask,
-                w,
-                h, true
-        )
-
-        val cropped = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(cropped)
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)
-        canvas.drawBitmap(original, 0f, 0f, null)
-        canvas.drawBitmap(scaledBitmap, 0f, 0f, paint)
-        paint.xfermode = null
-        return cropped
-    }
 
     override fun onCleared() {
         super.onCleared()

@@ -38,8 +38,8 @@ import java.util.*
  * This is where we show both the captured input image and the output image
  */
 class OcrFragment : Fragment(),
-    SearchFragmentNavigationAdapter.SearchClickItemListener,
-    StyleFragment.OnListFragmentInteractionListener {
+        SearchFragmentNavigationAdapter.SearchClickItemListener,
+        StyleFragment.OnListFragmentInteractionListener {
 
     private val args: OcrFragmentArgs by navArgs()
     private lateinit var filePath: String
@@ -54,7 +54,7 @@ class OcrFragment : Fragment(),
     private lateinit var photoFile: File
 
     // RecyclerView
-    private lateinit var mSearchFragmentNavigationAdapter: SearchFragmentNavigationAdapter
+    private lateinit var searchFragmentNavigationAdapter: SearchFragmentNavigationAdapter
 
     //
     private lateinit var ocrModelExecutor: OcrModelExecutor
@@ -62,7 +62,8 @@ class OcrFragment : Fragment(),
     private lateinit var scaledBitmap: Bitmap
     private lateinit var selfieBitmap: Bitmap
     private lateinit var loadedBitmap: Bitmap
-    private lateinit var outputArray: LongArray
+    private var outputArray: LongArray = longArrayOf()
+    private var inferenceFullTime = 0L
 
     private var outputBitmapFinal: Bitmap? = null
     private var inferenceTime: Long = 0L
@@ -78,8 +79,8 @@ class OcrFragment : Fragment(),
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentSelfie2segmentationBinding.inflate(inflater)
@@ -87,24 +88,22 @@ class OcrFragment : Fragment(),
         binding.viewModelXml = viewModel
 
         // RecyclerView setup
-        mSearchFragmentNavigationAdapter =
-            SearchFragmentNavigationAdapter(
-                requireActivity(),
-                viewModel.currentList,
-                this
-            )
+        searchFragmentNavigationAdapter =
+                SearchFragmentNavigationAdapter(
+                        requireActivity(),
+                        viewModel.currentList,
+                        this
+                )
         binding.recyclerViewStyles.apply {
             setHasFixedSize(true)
             layoutManager =
-                LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-            adapter = mSearchFragmentNavigationAdapter
+                    LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+            adapter = searchFragmentNavigationAdapter
 
         }
 
         // Initialize class with Koin
         ocrModelExecutor = get()
-
-        getKoin().setProperty(getString(R.string.koinStyle), viewModel.stylename)
 
         observeViewModel()
 
@@ -135,43 +134,43 @@ class OcrFragment : Fragment(),
     private fun observeViewModel() {
 
         viewModel.styledBitmap.observe(
-            requireActivity(),
-            Observer { resultImage ->
-                if (resultImage != null) {
-                    /*Glide.with(activity!!)
-                        .load(resultImage.styledImage)
-                        .fitCenter()
-                        .into(binding.imageViewStyled)*/
+                requireActivity(),
+                Observer { resultImage ->
+                    if (resultImage != null) {
+                        /*Glide.with(activity!!)
+                            .load(resultImage.styledImage)
+                            .fitCenter()
+                            .into(binding.imageViewStyled)*/
 
-                    // Set this to use with save function
-                    /*finalBitmapWithStyle = viewModel.cropBitmapWithMaskForStyle(
-                        outputBitmapFinal
-                    )*/
-
-                    /*binding.imageviewStyled.setImageBitmap(
-                        viewModel.cropBitmapWithMaskForStyle(
+                        // Set this to use with save function
+                        /*finalBitmapWithStyle = viewModel.cropBitmapWithMaskForStyle(
                             outputBitmapFinal
-                        )
-                    )*///selfieBitmap
+                        )*/
+
+                        /*binding.imageviewStyled.setImageBitmap(
+                            viewModel.cropBitmapWithMaskForStyle(
+                                outputBitmapFinal
+                            )
+                        )*///selfieBitmap
+                    }
                 }
-            }
         )
 
         // Observe style transfer procedure
         viewModel.inferenceDone.observe(
-            requireActivity(),
-            Observer { loadingDone ->
-                when (loadingDone) {
-                    true -> binding.progressbarStyle.visibility = View.GONE
+                requireActivity(),
+                Observer { loadingDone ->
+                    when (loadingDone) {
+                        true -> binding.progressbarStyle.visibility = View.GONE
+                    }
                 }
-            }
         )
 
         viewModel.totalTimeInference.observe(
-            requireActivity(),
-            Observer { time ->
-                //binding.inferenceInfoStyle.text = "Total process time: ${time}ms"
-            }
+                requireActivity(),
+                Observer { time ->
+                    //binding.inferenceInfoStyle.text = "Total process time: ${time}ms"
+                }
         )
     }
 
@@ -194,8 +193,8 @@ class OcrFragment : Fragment(),
 
             lifecycleScope.launch(Dispatchers.Default) {
                 val (longArray, inferenceTime) = viewModel.performOcr(
-                    loadedBitmap,
-                    requireActivity()
+                        loadedBitmap,
+                        requireActivity()
                 )
                 outputArray = longArray
                 Log.e("RESULT", outputArray.contentToString())
@@ -216,41 +215,41 @@ class OcrFragment : Fragment(),
 
             // When selecting image from gallery
             loadedBitmap =
-                BitmapFactory.decodeStream(
-                    requireActivity().contentResolver.openInputStream(
-                        filePath.toUri()
+                    BitmapFactory.decodeStream(
+                            requireActivity().contentResolver.openInputStream(
+                                    filePath.toUri()
+                            )
                     )
-                )
 
             Glide.with(imageview_input.context)
-                .load(loadedBitmap)
-                .fitCenter()
-                .into(imageview_input)
+                    .load(loadedBitmap)
+                    .fitCenter()
+                    .into(imageview_input)
 
             // Make input ImageView visible
             binding.imageviewInput.visibility = View.VISIBLE
 
             lifecycleScope.launch(Dispatchers.Default) {
                 val (longArray, inferenceTime) = viewModel.performOcr(
-                    loadedBitmap,
-                    requireActivity()
+                        loadedBitmap,
+                        requireActivity()
                 )
                 outputArray = longArray
                 Log.e("RESULT", outputArray.contentToString())
 
 
-                withContext(Dispatchers.Main) {
+                /*withContext(Dispatchers.Main) {
 
-                    /*// Make input ImageView gone
+                    // Make input ImageView gone
                     binding.imageviewInput.visibility = View.GONE
 
                     updateUI(outputBitmap, inferenceTime)
                     finalBitmap = outputBitmap
 
                     // Make output Image visible
-                    binding.imageviewOutput.visibility = View.VISIBLE*/
+                    binding.imageviewOutput.visibility = View.VISIBLE
 
-                }
+                }*/
             }
 
         }
@@ -261,22 +260,13 @@ class OcrFragment : Fragment(),
         progressbar.visibility = View.GONE
         imageview_input.visibility = View.INVISIBLE
         Glide.with(imageview_output.context)
-            .load(outputBitmap)
-            .fitCenter()
-            .into(imageview_output)
+                .load(outputBitmap)
+                .fitCenter()
+                .into(imageview_output)
         //imageview_output?.setImageBitmap(outputBitmap)
         inference_info.text = "Total process time: " + inferenceTime.toString() + "ms"
 
         //showStyledImage("mona.JPG")
-    }
-
-    private fun showStyledImage(style: String) {
-        lifecycleScope.launch(Dispatchers.Default) {
-
-            viewModel.onApplyStyle(
-                requireActivity(), scaledBitmap, style
-            )
-        }
     }
 
     override fun onDestroy() {
@@ -299,15 +289,15 @@ class OcrFragment : Fragment(),
     private fun saveImageToSDCard(bitmap: Bitmap?): String {
 
         val file = File(
-            MainActivity.getOutputDirectory(requireContext()),
-            SimpleDateFormat(
-                FILENAME_FORMAT, Locale.US
-            ).format(System.currentTimeMillis()) + "_segmentation_and_style_transfer.jpg"
+                MainActivity.getOutputDirectory(requireContext()),
+                SimpleDateFormat(
+                        FILENAME_FORMAT, Locale.US
+                ).format(System.currentTimeMillis()) + "_segmentation_and_style_transfer.jpg"
         )
 
         ImageUtils.saveBitmap(bitmap, file)
         Toast.makeText(context, "saved to " + file.absolutePath.toString(), Toast.LENGTH_SHORT)
-            .show()
+                .show()
 
         return file.absolutePath
 
@@ -328,16 +318,32 @@ class OcrFragment : Fragment(),
         imageview_placeholder.visibility = View.GONE
 
         // Created scaled version of bitmap for model input.
-        scaledBitmap = Bitmap.createScaledBitmap(
+        /*scaledBitmap = Bitmap.createScaledBitmap(
             selfieBitmap,
             MODEL_WIDTH,
             MODEL_HEIGHT, true
-        )
+        )*/
 
-        showStyledImage(type)
-        getKoin().setProperty(getString(R.string.koinStyle), type)
-        viewModel.setStyleName(type)
+        val (longArray, inferenceTime) = executeOcr(type)
+        Log.e("RESULT_OCR", longArray.contentToString())
+        //getKoin().setProperty(getString(R.string.koinStyle), type)
 
+    }
+
+    private fun executeOcr(path: String): Pair<LongArray, Long> {
+
+        lifecycleScope.launch(Dispatchers.Default) {
+
+            val (longArray, inferenceTime) = viewModel.onClickPerformOcr(
+                    requireActivity(), path
+            )
+            withContext(Dispatchers.Main) {
+                outputArray = longArray
+                inferenceFullTime = inferenceTime
+            }
+        }
+
+        return Pair(outputArray, inferenceFullTime)
     }
 
     override fun onListFragmentInteraction(item: String) {
@@ -348,13 +354,12 @@ class OcrFragment : Fragment(),
         stylesFragment.dismiss()
 
         scaledBitmap = Bitmap.createScaledBitmap(
-            selfieBitmap,
-            MODEL_WIDTH,
-            MODEL_HEIGHT, true
+                selfieBitmap,
+                MODEL_WIDTH,
+                MODEL_HEIGHT, true
         )
 
-        showStyledImage(item)
+        executeOcr(item)
         getKoin().setProperty(getString(R.string.koinStyle), item)
-        viewModel.setStyleName(item)
     }
 }
