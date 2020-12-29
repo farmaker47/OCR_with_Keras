@@ -1,3 +1,4 @@
 # Keras OCR application
 
-Extract text from images.
+
+Extract text from images

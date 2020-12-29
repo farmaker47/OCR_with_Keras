@@ -22,7 +22,7 @@ class OcrViewModel(application: Application) :
 
     private lateinit var imageSegmenter: ImageSegmenter
     private lateinit var scaledMaskBitmap: Bitmap
-    private lateinit var outputArray: IntArray
+    private lateinit var outputArray: LongArray
     var startTime: Long = 0L
     var inferenceTime = 0L
     lateinit var scaledBitmapObject: Bitmap
@@ -91,14 +91,14 @@ class OcrViewModel(application: Application) :
         _inferenceDone.postValue(true)*/
     }
 
-    fun performOcr(bitmap: Bitmap, context: Context): Pair<IntArray, Long> {
+    fun performOcr(bitmap: Bitmap, context: Context): Pair<LongArray, Long> {
         try {
             // Initialization
             startTime = SystemClock.uptimeMillis()
 
             // Run inference
             val result = ocrModelExecutor.executeOcrWithInterpreter(bitmap, context)
-            Log.e("RESULT", result.contentToString())
+            outputArray = result
 
             inferenceTime = SystemClock.uptimeMillis() - startTime
         } catch (e: IOException) {

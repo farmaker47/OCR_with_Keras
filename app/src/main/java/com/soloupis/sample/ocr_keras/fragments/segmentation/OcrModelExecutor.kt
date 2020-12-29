@@ -24,8 +24,6 @@ import java.nio.channels.FileChannel
 data class ModelExecutionResult(
     val intArray: Bitmap,
     val preProcessTime: Long = 0L,
-    val stylePredictTime: Long = 0L,
-    val styleTransferTime: Long = 0L,
     val postProcessTime: Long = 0L,
     val totalExecutionTime: Long = 0L,
     val executionLog: String = "",
@@ -41,8 +39,6 @@ class OcrModelExecutor(
     private var numberThreads = 7
     private var fullExecutionTime = 0L
     private var preProcessTime = 0L
-    private var stylePredictTime = 0L
-    private var styleTransferTime = 0L
     private var postProcessTime = 0L
     private val interpreterPredict: Interpreter
 
@@ -61,70 +57,6 @@ class OcrModelExecutor(
         private const val OCR_MODEL = "ocr_dr.tflite"
     }
 
-    /*// Function for ML Binding
-    fun executeWithMLBinding(
-            contentImagePath: Bitmap,
-            styleImageName: String,
-            context: Context
-    ): ModelExecutionResult {
-        try {
-            Log.i(TAG, "running models")
-
-            fullExecutionTime = SystemClock.uptimeMillis()
-
-            preProcessTime = SystemClock.uptimeMillis()
-            // Creates inputs for reference.
-            val styleBitmap = ImageUtils.loadBitmapFromResources(context, "thumbnails/$styleImageName")
-            val styleImage = TensorImage.fromBitmap(styleBitmap)
-            val contentImage = TensorImage.fromBitmap(contentImagePath)
-            preProcessTime = SystemClock.uptimeMillis() - preProcessTime
-
-            stylePredictTime = SystemClock.uptimeMillis()
-            // The results of this inference could be reused given the style does not change
-            // That would be a good practice in case this was applied to a video stream.
-            // Runs model inference and gets result.
-            val outputsPredict = modelMlBindingPredict.process(styleImage)
-            val styleBottleneckPredict = outputsPredict.styleBottleneckAsTensorBuffer
-            stylePredictTime = SystemClock.uptimeMillis() - stylePredictTime
-            Log.d(TAG, "Style Predict Time to run: $stylePredictTime")
-
-            styleTransferTime = SystemClock.uptimeMillis()
-            // Runs model inference and gets result.
-            val outputs = modelMlBindingTransfer.process(contentImage, styleBottleneckPredict)
-            styleTransferTime = SystemClock.uptimeMillis() - styleTransferTime
-            Log.d(TAG, "Style apply Time to run: $styleTransferTime")
-
-            postProcessTime = SystemClock.uptimeMillis()
-            val styledImage = outputs.styledImageAsTensorImage
-            val styledImageBitmap = styledImage.bitmap
-            postProcessTime = SystemClock.uptimeMillis() - postProcessTime
-
-            fullExecutionTime = SystemClock.uptimeMillis() - fullExecutionTime
-            Log.d(TAG, "Time to run everything: $fullExecutionTime")
-
-            return ModelExecutionResult(
-                    styledImageBitmap,
-                    preProcessTime,
-                    stylePredictTime,
-                    styleTransferTime,
-                    postProcessTime,
-                    fullExecutionTime,
-                    formatExecutionLog()
-            )
-        } catch (e: Exception) {
-            val exceptionLog = "something went wrong: ${e.message}"
-            Log.d(TAG, exceptionLog)
-
-            val emptyBitmap =
-                    ImageUtils.createEmptyBitmap(
-                            CONTENT_IMAGE_SIZE,
-                            CONTENT_IMAGE_SIZE
-                    )
-            return ModelExecutionResult(
-                    emptyBitmap, errorMessage = e.message!!
-            )
-        }
-    }*/
     // Function for Interpreter
     fun executeOcrWithInterpreter(
         contentImage: Bitmap,
@@ -135,99 +67,20 @@ class OcrModelExecutor(
 
             fullExecutionTime = SystemClock.uptimeMillis()
 
-            // Create an ImageProcessor with all ops required. For more ops, please
-            // refer to the ImageProcessor Architecture.
-            val imageProcessor = ImageProcessor.Builder()
-                .add(
-                    ResizeOp(
-                        31,
-                        200,
-                        ResizeOp.ResizeMethod.BILINEAR
-                    )
-                )
-                .add(NormalizeOp(0f, 255.0f))
-                .build()
-
-            Log.i(TAG, "after imageProcessor")
-
-            // Create a TensorImage object. This creates the tensor of the corresponding
-            // tensor type (flot32 in this case) that the TensorFlow Lite interpreter needs.
-            var tImage = TensorImage(DataType.FLOAT32)
-            //var buf = TensorBuffer.createDynamic(DataType.FLOAT32)
-
-            // Analysis code for every frame
-            // Preprocess the image
-
-            tImage.load(androidGrayScale(contentImage))
-
-
-            //tImage.load(buf,ColorSpaceType.GRAYSCALE)
-            /*val bitmap = BitmapFactory.decodeByteArray(
-                bufferToByteArray(
-                    getByteBufferNormalized(
-                        androidGrayScale(
-                            contentImage
-                        )
-                    )
-                ), 0, bufferToByteArray(
-                    getByteBufferNormalized(
-                        androidGrayScale(
-                            contentImage
-                        )
-                    )
-                ).size
-            )
-            tImage.load(bitmap)*/
-            /*tImage.load(
-                TensorBuffer.createFixedSize(
-                    byteArrayToIntArray(
-                        bufferToByteArray(
-                            getByteBufferNormalized(
-                                androidGrayScale(
-                                    contentImage
-                                )
-                            )
-                        )
-                    ), DataType.FLOAT32
-                ), ColorSpaceType.GRAYSCALE
-            )*/
-            Log.i(TAG, "after loading")
-            tImage = imageProcessor.process(tImage)
-            Log.i(TAG, "after processing")
-
-            // Create a container for the result and specify that this is not a quantized model.
-            // Hence, the 'DataType' is defined as float32
-
-
-            /*val probabilityBuffer = TensorBuffer.createFixedSize(
-                intArrayOf(1, 48),
-                DataType.INT64
-            )*/
-            //val outputs = HashMap<Int, Any>()
             val arrayOutputs = Array(1) { LongArray(48) { 0 } }
-            //outputs[0]=arrayOutputs
-            Log.i(TAG, "after probability buffer")
-
-
-            /*interpreterPredict.run(
-                ImageUtils.bitmapToByteBuffer(
-                    contentImage, CONTENT_IMAGE_WIDTH,
-                    CONTENT_IMAGE_HEIGHT
-                ), probabilityBuffer.buffer
-            )*/
 
             interpreterPredict.run(
                 getByteBufferNormalized(androidGrayScale(contentImage)), arrayOutputs
             )
 
-            //interpreterPredict.run(tImage.buffer, arrayOutputs)
-
             Log.i(TAG, "after running")
 
             fullExecutionTime = SystemClock.uptimeMillis() - fullExecutionTime
+
             Log.i(TAG, "Time to run everything: $fullExecutionTime")
 
             return arrayOutputs[0]
+
         } catch (e: Exception) {
 
             val exceptionLog = "something went wrong: ${e.message}"
@@ -236,86 +89,6 @@ class OcrModelExecutor(
             return longArrayOf()
         }
     }
-
-    /*private fun getBitmap(buffer: ByteBuffer, width: Int, height: Int): Bitmap {
-        buffer.rewind()
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        bitmap.copyPixelsFromBuffer(buffer)
-        return bitmap
-    }
-
-    private fun bufferToByteArray(buffer: ByteBuffer): ByteArray {
-
-        buffer.rewind()
-        val arr = ByteArray(buffer.remaining())
-        buffer.get(arr)
-        //buffer.array()
-
-        return arr
-    }
-
-    private fun byteArrayToIntArray(byteArray: ByteArray): IntArray {
-
-        val intBuf: IntBuffer = ByteBuffer.wrap(byteArray)
-            .order(ByteOrder.BIG_ENDIAN)
-            .asIntBuffer()
-        val array = IntArray(intBuf.remaining())
-        intBuf.get(array)
-
-        return array
-    }*/
-
-    /*// Function for ML Binding
-    fun executeOcrWithMLBinding(
-        contentImage: Bitmap,
-        context: Context
-    ): IntArray {
-        try {
-            Log.i(TAG, "running models")
-
-            fullExecutionTime = SystemClock.uptimeMillis()
-
-            preProcessTime = SystemClock.uptimeMillis()
-            // Creates inputs for reference.
-
-            val loadedImage = TensorImage.fromBitmap(contentImage).tensorBuffer
-            preProcessTime = SystemClock.uptimeMillis() - preProcessTime
-
-            stylePredictTime = SystemClock.uptimeMillis()
-            // The results of this inference could be reused given the style does not change
-            // That would be a good practice in case this was applied to a video stream.
-            // Runs model inference and gets result.
-            Log.d(TAG, "Style Predict Time to run: $stylePredictTime")
-            val outputsPredict = ocrFloat16Metadata.process(loadedImage)
-            stylePredictTime = SystemClock.uptimeMillis() - stylePredictTime
-            Log.d(TAG, "Style Predict Time to run: $stylePredictTime")
-
-            styleTransferTime = SystemClock.uptimeMillis()
-            // Runs model inference and gets result.
-            styleTransferTime = SystemClock.uptimeMillis() - styleTransferTime
-            Log.d(TAG, "Style apply Time to run: $styleTransferTime")
-
-            postProcessTime = SystemClock.uptimeMillis()
-            postProcessTime = SystemClock.uptimeMillis() - postProcessTime
-
-            fullExecutionTime = SystemClock.uptimeMillis() - fullExecutionTime
-            Log.d(TAG, "Time to run everything: $fullExecutionTime")
-
-            return outputsPredict.arrayOutputAsTensorBuffer.intArray
-        } catch (e: Exception) {
-            val exceptionLog = "something went wrong: ${e.message}"
-            Log.e("EXECUTOR", exceptionLog)
-
-            *//*val emptyBitmap =
-                ImageUtils.createEmptyBitmap(
-                    CONTENT_IMAGE_SIZE,
-                    CONTENT_IMAGE_SIZE
-                )*//*
-            return intArrayOf()
-        }
-    }
-
-    */
 
     private fun getByteBufferNormalized(bitmapIn: Bitmap): ByteBuffer {
         val bitmap = Bitmap.createScaledBitmap(
@@ -345,9 +118,11 @@ class OcrModelExecutor(
         val tfliteOptions = Interpreter.Options()
 
         tfliteOptions.setNumThreads(numberThreads)
+
         //tfliteOptions.setUseNNAPI(true)     //846ms
         //tfliteOptions.setUseXNNPACK(true) //     Caused by: java.lang.IllegalArgumentException: Internal error: Failed to apply XNNPACK delegate:
         //     Attempting to use a delegate that only supports static-sized tensors with a graph that has dynamic-sized tensors.
+
         return Interpreter(loadModelFile(context, modelName), tfliteOptions)
     }
 
