@@ -114,7 +114,7 @@ class OcrFragment : Fragment(),
         }
 
         // Listeners for toggle buttons
-        binding.imageToggleLeft.setOnClickListener {
+        /*binding.imageToggleLeft.setOnClickListener {
 
             // Make input ImageView visible
             binding.imageviewInput.visibility = View.VISIBLE
@@ -127,7 +127,7 @@ class OcrFragment : Fragment(),
             binding.imageviewInput.visibility = View.GONE
             // Make output Image visible
             binding.imageviewOutput.visibility = View.VISIBLE
-        }
+        }*/
 
         return binding.root
     }
