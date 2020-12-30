@@ -26,7 +26,7 @@
             android:src="@drawable/ic_baseline_arrow_back_24"/>
 
         <TextView
-            android:text="S&amp;ST"
+            android:text="@string/app_name"
             android:textColor="#ffffff"
             android:textSize="24dp"
             android:layout_marginStart="24dp"

@@ -14,7 +14,7 @@
         android:foreground="?android:attr/selectableItemBackground">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="54dp"
             android:layout_gravity="center_vertical">
 
@@ -24,6 +24,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="0dp"
                 android:layout_marginEnd="0dp"
+                android:scaleType="fitXY"
                 android:layout_weight="1" />
 
         </LinearLayout>

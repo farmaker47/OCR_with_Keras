@@ -1,5 +1,6 @@
 package com.soloupis.sample.ocr_keras.fragments.segmentation
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -16,10 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.soloupis.sample.ocr_keras.MainActivity
 import com.soloupis.sample.ocr_keras.R
-import com.soloupis.sample.ocr_keras.databinding.FragmentSelfie2segmentationBinding
+import com.soloupis.sample.ocr_keras.databinding.FragmentOcrFragmentBinding
 import com.soloupis.sample.ocr_keras.fragments.StyleFragment
 import com.soloupis.sample.ocr_keras.utils.ImageUtils
-import kotlinx.android.synthetic.main.fragment_selfie2segmentation.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,7 +50,7 @@ class OcrFragment : Fragment(),
     private val viewModel: OcrViewModel by viewModel()
 
     // DataBinding
-    private lateinit var binding: FragmentSelfie2segmentationBinding
+    private lateinit var binding: FragmentOcrFragmentBinding
     private lateinit var photoFile: File
 
     // RecyclerView
@@ -83,7 +83,7 @@ class OcrFragment : Fragment(),
             savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = FragmentSelfie2segmentationBinding.inflate(inflater)
+        binding = FragmentOcrFragmentBinding.inflate(inflater)
         binding.lifecycleOwner = this
         binding.viewModelXml = viewModel
 
@@ -108,9 +108,9 @@ class OcrFragment : Fragment(),
         observeViewModel()
 
         // Click on Style picker
-        binding.chooseStyleTextView.setOnClickListener {
+        /*binding.chooseStyleTextView.setOnClickListener {
             stylesFragment.show(requireActivity().supportFragmentManager, "StylesFragment")
-        }
+        }*/
 
         // Listeners for toggle buttons
         /*binding.imageToggleLeft.setOnClickListener {
@@ -161,7 +161,7 @@ class OcrFragment : Fragment(),
                 requireActivity(),
                 Observer { loadingDone ->
                     when (loadingDone) {
-                        true -> binding.progressbarStyle.visibility = View.GONE
+                        //true -> binding.progressbarStyle.visibility = View.GONE
                     }
                 }
         )
@@ -188,7 +188,7 @@ class OcrFragment : Fragment(),
             binding.imageviewInput.visibility = View.VISIBLE
 
             selfieBitmap = BitmapFactory.decodeFile(filePath)
-            imageview_input.setImageBitmap(selfieBitmap)
+            binding.imageviewInput.setImageBitmap(selfieBitmap)
 
 
             lifecycleScope.launch(Dispatchers.Default) {
@@ -221,13 +221,13 @@ class OcrFragment : Fragment(),
                             )
                     )
 
-            Glide.with(imageview_input.context)
+            Glide.with(binding.imageviewInput.context)
                     .load(loadedBitmap)
                     .fitCenter()
-                    .into(imageview_input)
+                    .into(binding.imageviewInput)
 
             // Make input ImageView visible
-            binding.imageviewInput.visibility = View.VISIBLE
+            binding.imageviewInput.visibility = View.GONE
 
             lifecycleScope.launch(Dispatchers.Default) {
                 val (longArray, inferenceTime) = viewModel.performOcr(
@@ -257,14 +257,14 @@ class OcrFragment : Fragment(),
     }
 
     private fun updateUI(outputBitmap: Bitmap?, inferenceTime: Long) {
-        progressbar.visibility = View.GONE
-        imageview_input.visibility = View.INVISIBLE
-        Glide.with(imageview_output.context)
+        binding.progressbar.visibility = View.GONE
+        binding.imageviewInput.visibility = View.INVISIBLE
+        Glide.with(binding.imageviewOutput.context)
                 .load(outputBitmap)
                 .fitCenter()
-                .into(imageview_output)
+                .into(binding.imageviewOutput)
         //imageview_output?.setImageBitmap(outputBitmap)
-        inference_info.text = "Total process time: " + inferenceTime.toString() + "ms"
+        binding.inferenceInfo.text = "Total process time: " + inferenceTime.toString() + "ms"
 
         //showStyledImage("mona.JPG")
     }
@@ -310,12 +310,12 @@ class OcrFragment : Fragment(),
         const val MODEL_HEIGHT = 256
     }
 
-    override fun onListItemClick(itemIndex: Int, sharedImage: ImageView?, type: String) {
+    override fun onListItemClick(itemIndex: Int, sharedImage: ImageView?, imagePath: String) {
 
         // Upon click show progress bar
-        binding.progressbarStyle.visibility = View.VISIBLE
+        //binding.progressbarStyle.visibility = View.VISIBLE
         // make placeholder gone
-        imageview_placeholder.visibility = View.GONE
+        //binding.imageviewPlaceholder.visibility = View.GONE
 
         // Created scaled version of bitmap for model input.
         /*scaledBitmap = Bitmap.createScaledBitmap(
@@ -324,11 +324,15 @@ class OcrFragment : Fragment(),
             MODEL_HEIGHT, true
         )*/
 
-        val (longArray, inferenceTime) = executeOcr(type)
+        val (longArray, inferenceTime) = executeOcr(imagePath)
         Log.e("RESULT_OCR", longArray.contentToString())
         //getKoin().setProperty(getString(R.string.koinStyle), type)
+        binding.imageviewOutput.setImageBitmap(getBitmapFromAsset(requireActivity(), "thumbnails/$imagePath"))
 
     }
+
+    private fun getBitmapFromAsset(context: Context, path: String): Bitmap =
+            context.assets.open(path).use { BitmapFactory.decodeStream(it) }
 
     private fun executeOcr(path: String): Pair<LongArray, Long> {
 
