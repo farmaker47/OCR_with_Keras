@@ -10,8 +10,8 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -23,9 +23,11 @@ import com.soloupis.sample.ocr_keras.utils.ImageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.bind
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.getKoin
 import org.koin.android.viewmodel.ext.android.viewModel
+import org.tensorflow.lite.support.common.FileUtil
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -62,8 +64,12 @@ class OcrFragment : Fragment(),
     private lateinit var scaledBitmap: Bitmap
     private lateinit var selfieBitmap: Bitmap
     private lateinit var loadedBitmap: Bitmap
+
+
     private var outputArray: LongArray = longArrayOf()
     private var inferenceFullTime = 0L
+    private lateinit var labels: List<String>
+
 
     private var outputBitmapFinal: Bitmap? = null
     private var inferenceTime: Long = 0L
@@ -106,6 +112,8 @@ class OcrFragment : Fragment(),
         ocrModelExecutor = get()
 
         observeViewModel()
+
+        labels = FileUtil.loadLabels(requireActivity(), "alphabets.txt")
 
         // Click on Style picker
         /*binding.chooseStyleTextView.setOnClickListener {
@@ -230,12 +238,12 @@ class OcrFragment : Fragment(),
             binding.imageviewInput.visibility = View.GONE
 
             lifecycleScope.launch(Dispatchers.Default) {
-                val (longArray, inferenceTime) = viewModel.performOcr(
+                /*val (longArray, inferenceTime) = viewModel.performOcr(
                         loadedBitmap,
                         requireActivity()
                 )
                 outputArray = longArray
-                Log.e("RESULT", outputArray.contentToString())
+                Log.e("RESULT", outputArray.contentToString())*/
 
 
                 /*withContext(Dispatchers.Main) {
@@ -264,7 +272,7 @@ class OcrFragment : Fragment(),
                 .fitCenter()
                 .into(binding.imageviewOutput)
         //imageview_output?.setImageBitmap(outputBitmap)
-        binding.inferenceInfo.text = "Total process time: " + inferenceTime.toString() + "ms"
+        //binding.inferenceInfo.text = "Total process time: " + inferenceTime.toString() + "ms"
 
         //showStyledImage("mona.JPG")
     }
@@ -304,7 +312,7 @@ class OcrFragment : Fragment(),
     }
 
     companion object {
-        private const val TAG = "SegmentationAndStyleTransferFragment"
+        private const val TAG = "OcrFragment"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         const val MODEL_WIDTH = 256
         const val MODEL_HEIGHT = 256
@@ -324,8 +332,7 @@ class OcrFragment : Fragment(),
             MODEL_HEIGHT, true
         )*/
 
-        val (longArray, inferenceTime) = executeOcr(imagePath)
-        Log.e("RESULT_OCR", longArray.contentToString())
+        executeOcr(imagePath)
         //getKoin().setProperty(getString(R.string.koinStyle), type)
         binding.imageviewOutput.setImageBitmap(getBitmapFromAsset(requireActivity(), "thumbnails/$imagePath"))
 
@@ -344,6 +351,18 @@ class OcrFragment : Fragment(),
             withContext(Dispatchers.Main) {
                 outputArray = longArray
                 inferenceFullTime = inferenceTime
+                Log.e("RESULT_OCR", outputArray.contentToString())
+
+                val sb: StringBuilder = StringBuilder()
+                for (i in outputArray.indices) {
+                    if (outputArray[i].toString() != "-1") {
+                        sb.append(labels[outputArray[i].toInt()])
+                    }
+                }
+
+                binding.inferenceTime.text = "Inference Time: ${inferenceFullTime}ms"
+                binding.textViewOcrResult.text = sb.toString()
+
             }
         }
 

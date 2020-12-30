@@ -49,7 +49,7 @@
                     android:id="@+id/frame_output"
                     android:layout_width="244dp"
                     android:layout_height="100dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="32dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textSegmentation">
@@ -67,7 +67,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:indeterminateTint="@color/dark_gray"
-                        android:visibility="visible" />
+                        android:visibility="invisible" />
 
                     <ImageView
                         android:id="@+id/imageview_output"
@@ -77,24 +77,6 @@
                         android:visibility="visible" />
                 </FrameLayout>
 
-                <TextView
-                    android:id="@+id/inference_info"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/frame_output" />
-
-                <View
-                    android:id="@+id/viewHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginTop="16dp"
-                    android:background="#ededed"
-                    app:layout_constraintTop_toBottomOf="@id/recyclerViewStyles" />
-
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewStyles"
                     android:layout_width="match_parent"
@@ -102,22 +84,49 @@
                     android:layout_marginTop="12dp"
                     app:layout_constraintTop_toBottomOf="@id/frame_output" />
 
-
+                <TextView
+                    android:id="@+id/headerKerasOcr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textAlignment="center"
+                    android:text="@string/keras_ocr_result"
+                    android:textStyle="bold"
+                    android:textAppearance="@android:style/TextAppearance.Large"
+                    android:textSize="28sp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/recyclerViewStyles" />
 
                 <TextView
-                    android:id="@+id/textStyleTransfer"
+                    android:id="@+id/textViewOcrResult"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:visibility="gone"
-                    android:fontFamily="@font/aguafina_script"
-                    android:text="@string/aboutSyleTransfer"
                     android:textAlignment="center"
                     android:textAppearance="@android:style/TextAppearance.Large"
                     android:textSize="28sp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/viewHorizontal" />
+                    app:layout_constraintTop_toBottomOf="@id/headerKerasOcr" />
+
+                <TextView
+                    android:id="@+id/inferenceTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textViewOcrResult" />
+
+                <View
+                    android:id="@+id/viewHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#ededed"
+                    app:layout_constraintTop_toBottomOf="@id/inferenceTime" />
 
                 <!--<FrameLayout
                     android:id="@+id/frame_output_style"
