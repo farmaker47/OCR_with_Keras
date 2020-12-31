@@ -38,40 +38,21 @@ import java.util.*
 class OcrFragment : Fragment(),
         SearchFragmentNavigationAdapter.SearchClickItemListener {
 
-    private lateinit var filePath: String
-    private var finalBitmap: Bitmap? = null
-    private var finalBitmapWithStyle: Bitmap? = null
-
     // Koin inject ViewModel
     private val viewModel: OcrViewModel by viewModel()
 
     // DataBinding
     private lateinit var binding: FragmentOcrFragmentBinding
-    private lateinit var photoFile: File
 
     // RecyclerView
     private lateinit var searchFragmentNavigationAdapter: SearchFragmentNavigationAdapter
-
-    //
     private lateinit var ocrModelExecutor: OcrModelExecutor
-
-    private lateinit var scaledBitmap: Bitmap
-    private lateinit var selfieBitmap: Bitmap
-    private lateinit var loadedBitmap: Bitmap
-
-
     private var outputArray: LongArray = longArrayOf()
     private var inferenceFullTime = 0L
     private lateinit var labels: List<String>
 
-
-    private var outputBitmapFinal: Bitmap? = null
-    private var inferenceTime: Long = 0L
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setHasOptionsMenu(true) // enable toolbar
 
         retainInstance = true
     }
@@ -92,7 +73,7 @@ class OcrFragment : Fragment(),
                         viewModel.currentList,
                         this
                 )
-        binding.recyclerViewStyles.apply {
+        binding.recyclerViewImages.apply {
             setHasFixedSize(true)
             layoutManager =
                     LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
@@ -107,56 +88,12 @@ class OcrFragment : Fragment(),
 
         labels = FileUtil.loadLabels(requireActivity(), "alphabets.txt")
 
-        // Click on Style picker
-        /*binding.chooseStyleTextView.setOnClickListener {
-            stylesFragment.show(requireActivity().supportFragmentManager, "StylesFragment")
-        }*/
-
-        // Listeners for toggle buttons
-        /*binding.imageToggleLeft.setOnClickListener {
-
-            // Make input ImageView visible
-            binding.imageviewInput.visibility = View.VISIBLE
-            // Make output Image gone
-            binding.imageviewOutput.visibility = View.GONE
-        }
-        binding.imageToggleRight.setOnClickListener {
-
-            // Make input ImageView gone
-            binding.imageviewInput.visibility = View.GONE
-            // Make output Image visible
-            binding.imageviewOutput.visibility = View.VISIBLE
-        }*/
-
         return binding.root
     }
 
     private fun observeViewModel() {
 
-        viewModel.styledBitmap.observe(
-                requireActivity(),
-                Observer { resultImage ->
-                    if (resultImage != null) {
-                        /*Glide.with(activity!!)
-                            .load(resultImage.styledImage)
-                            .fitCenter()
-                            .into(binding.imageViewStyled)*/
-
-                        // Set this to use with save function
-                        /*finalBitmapWithStyle = viewModel.cropBitmapWithMaskForStyle(
-                            outputBitmapFinal
-                        )*/
-
-                        /*binding.imageviewStyled.setImageBitmap(
-                            viewModel.cropBitmapWithMaskForStyle(
-                                outputBitmapFinal
-                            )
-                        )*///selfieBitmap
-                    }
-                }
-        )
-
-        // Observe style transfer procedure
+        // Observe ocr procedure
         viewModel.inferenceDone.observe(
                 requireActivity(),
                 Observer { loadingDone ->
@@ -166,12 +103,6 @@ class OcrFragment : Fragment(),
                 }
         )
 
-        viewModel.totalTimeInference.observe(
-                requireActivity(),
-                Observer { time ->
-                    //binding.inferenceInfoStyle.text = "Total process time: ${time}ms"
-                }
-        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -180,51 +111,9 @@ class OcrFragment : Fragment(),
 
     }
 
-    private fun updateUI(outputBitmap: Bitmap?, inferenceTime: Long) {
-        binding.progressbar.visibility = View.GONE
-        binding.imageviewInput.visibility = View.INVISIBLE
-        Glide.with(binding.imageviewOutput.context)
-                .load(outputBitmap)
-                .fitCenter()
-                .into(binding.imageviewOutput)
-        //imageview_output?.setImageBitmap(outputBitmap)
-        //binding.inferenceInfo.text = "Total process time: " + inferenceTime.toString() + "ms"
-
-        //showStyledImage("mona.JPG")
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         // clean up coroutine job
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_main, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_save -> saveImageToSDCard(finalBitmapWithStyle)
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun saveImageToSDCard(bitmap: Bitmap?): String {
-
-        val file = File(
-                MainActivity.getOutputDirectory(requireContext()),
-                SimpleDateFormat(
-                        FILENAME_FORMAT, Locale.US
-                ).format(System.currentTimeMillis()) + "_segmentation_and_style_transfer.jpg"
-        )
-
-        ImageUtils.saveBitmap(bitmap, file)
-        Toast.makeText(context, "saved to " + file.absolutePath.toString(), Toast.LENGTH_SHORT)
-                .show()
-
-        return file.absolutePath
-
     }
 
     companion object {
@@ -235,18 +124,6 @@ class OcrFragment : Fragment(),
     }
 
     override fun onListItemClick(itemIndex: Int, sharedImage: ImageView?, imagePath: String) {
-
-        // Upon click show progress bar
-        //binding.progressbarStyle.visibility = View.VISIBLE
-        // make placeholder gone
-        //binding.imageviewPlaceholder.visibility = View.GONE
-
-        // Created scaled version of bitmap for model input.
-        /*scaledBitmap = Bitmap.createScaledBitmap(
-            selfieBitmap,
-            MODEL_WIDTH,
-            MODEL_HEIGHT, true
-        )*/
 
         executeOcr(imagePath)
         //getKoin().setProperty(getString(R.string.koinStyle), type)

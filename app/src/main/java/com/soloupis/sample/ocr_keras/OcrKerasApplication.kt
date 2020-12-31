@@ -1,7 +1,7 @@
 package com.soloupis.sample.ocr_keras
 
 import android.app.Application
-import com.soloupis.sample.ocr_keras.di.segmentationAndStyleTransferModule
+import com.soloupis.sample.ocr_keras.di.ocrTransferModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -14,7 +14,7 @@ class OcrKerasApplication : Application() {
             //androidContext(applicationContext)
             androidContext(this@OcrKerasApplication)
             modules(
-                segmentationAndStyleTransferModule
+                    ocrTransferModule
             )
         }
 

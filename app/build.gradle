@@ -80,8 +80,6 @@ dependencies {
     implementation("org.tensorflow:tensorflow-lite:${tfl_version}") { changing = true }
     implementation("org.tensorflow:tensorflow-lite-gpu:${tfl_version}") { changing = true }
     implementation 'org.tensorflow:tensorflow-lite-support:0.0.0-nightly'
-    // Dependency for Segmentation with Task Library
-    implementation 'org.tensorflow:tensorflow-lite-task-vision:0.0.0-nightly'
 
     implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:0.0.0-nightly'
 

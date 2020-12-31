@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/textSegmentation"
+                    android:id="@+id/textOcr"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -52,7 +52,7 @@
                     android:layout_marginTop="32dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/textSegmentation">
+                    app:layout_constraintTop_toBottomOf="@id/textOcr">
 
                     <ImageView
                         android:id="@+id/imageview_input"
@@ -78,7 +78,7 @@
                 </FrameLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerViewStyles"
+                    android:id="@+id/recyclerViewImages"
                     android:layout_width="match_parent"
                     android:layout_height="90dp"
                     android:layout_marginTop="12dp"
@@ -96,7 +96,7 @@
                     android:textSize="28sp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/recyclerViewStyles" />
+                    app:layout_constraintTop_toBottomOf="@id/recyclerViewImages" />
 
                 <TextView
                     android:id="@+id/textViewOcrResult"
@@ -166,7 +166,7 @@
                 </FrameLayout>-->
 
                 <TextView
-                    android:id="@+id/inference_info_style"
+                    android:id="@+id/inference_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
