@@ -1,4 +1,4 @@
-package com.soloupis.sample.ocr_keras.fragments.segmentation
+package com.soloupis.sample.ocr_keras.fragments.ocr
 
 import android.content.Context
 import android.graphics.Bitmap

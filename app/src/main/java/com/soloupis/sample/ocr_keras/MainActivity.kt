@@ -7,8 +7,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.soloupis.sample.ocr_keras.fragments.StyleFragment
-import com.soloupis.sample.ocr_keras.fragments.segmentation.OcrFragment
-import com.soloupis.sample.ocr_keras.fragments.segmentation.OcrFragmentDirections
+import com.soloupis.sample.ocr_keras.fragments.ocr.OcrFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
@@ -27,12 +26,6 @@ class MainActivity : AppCompatActivity(),
         setSupportActionBar(toolbar)
 
         title = ""
-
-        // Navigate back to Camera fragment
-        imageViewBack.setOnClickListener {
-            val action = OcrFragmentDirections.backHome()
-            findNavController(R.id.fragment_container).navigate(action)
-        }
 
     }
 

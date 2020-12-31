@@ -8,7 +8,7 @@
 
         <variable
             name="viewModelXml"
-            type="com.soloupis.sample.ocr_keras.fragments.segmentation.OcrViewModel" />
+            type="com.soloupis.sample.ocr_keras.fragments.ocr.OcrViewModel" />
 
     </data>
 
@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        tools:context="com.soloupis.sample.ocr_keras.fragments.segmentation.OcrFragment">
+        tools:context="com.soloupis.sample.ocr_keras.fragments.ocr.OcrFragment">
 
         <ScrollView
             android:layout_width="match_parent"

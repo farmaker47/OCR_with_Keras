@@ -41,6 +41,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graph"
+        app:navGraph="@navigation/ocr_nav_fragment"
         tools:context="com.soloupis.sample.ocr_keras.MainActivity" />
 </androidx.constraintlayout.widget.ConstraintLayout>

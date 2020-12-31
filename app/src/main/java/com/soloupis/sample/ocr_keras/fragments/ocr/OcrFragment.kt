@@ -1,4 +1,4 @@
-package com.soloupis.sample.ocr_keras.fragments.segmentation
+package com.soloupis.sample.ocr_keras.fragments.ocr
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -23,7 +23,6 @@ import com.soloupis.sample.ocr_keras.utils.ImageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.bind
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.getKoin
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -43,7 +42,6 @@ class OcrFragment : Fragment(),
         SearchFragmentNavigationAdapter.SearchClickItemListener,
         StyleFragment.OnListFragmentInteractionListener {
 
-    private val args: OcrFragmentArgs by navArgs()
     private lateinit var filePath: String
     private var finalBitmap: Bitmap? = null
     private var finalBitmapWithStyle: Bitmap? = null
@@ -81,7 +79,6 @@ class OcrFragment : Fragment(),
         setHasOptionsMenu(true) // enable toolbar
 
         retainInstance = true
-        filePath = args.rootDir
     }
 
     override fun onCreateView(
@@ -184,83 +181,7 @@ class OcrFragment : Fragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (filePath.startsWith("/storage")) {
-            photoFile = File(filePath)
 
-            /*Glide.with(imageview_input.context)
-                    .load(photoFile)
-                    .fitCenter()
-                    .into(imageview_input)*/
-
-            // Make input ImageView visible
-            binding.imageviewInput.visibility = View.VISIBLE
-
-            selfieBitmap = BitmapFactory.decodeFile(filePath)
-            binding.imageviewInput.setImageBitmap(selfieBitmap)
-
-
-            lifecycleScope.launch(Dispatchers.Default) {
-                val (longArray, inferenceTime) = viewModel.performOcr(
-                        loadedBitmap,
-                        requireActivity()
-                )
-                outputArray = longArray
-                Log.e("RESULT", outputArray.contentToString())
-                withContext(Dispatchers.Main) {
-
-                    // Make input ImageView gone
-                    /*binding.imageviewInput.visibility = View.GONE
-
-                    updateUI(outputBitmap, inferenceTime)
-                    finalBitmap = outputBitmap
-
-                    // Make output Image visible
-                    binding.imageviewOutput.visibility = View.VISIBLE*/
-
-                }
-            }
-        } else {
-
-            // When selecting image from gallery
-            loadedBitmap =
-                    BitmapFactory.decodeStream(
-                            requireActivity().contentResolver.openInputStream(
-                                    filePath.toUri()
-                            )
-                    )
-
-            Glide.with(binding.imageviewInput.context)
-                    .load(loadedBitmap)
-                    .fitCenter()
-                    .into(binding.imageviewInput)
-
-            // Make input ImageView visible
-            binding.imageviewInput.visibility = View.GONE
-
-            lifecycleScope.launch(Dispatchers.Default) {
-                /*val (longArray, inferenceTime) = viewModel.performOcr(
-                        loadedBitmap,
-                        requireActivity()
-                )
-                outputArray = longArray
-                Log.e("RESULT", outputArray.contentToString())*/
-
-
-                /*withContext(Dispatchers.Main) {
-
-                    // Make input ImageView gone
-                    binding.imageviewInput.visibility = View.GONE
-
-                    updateUI(outputBitmap, inferenceTime)
-                    finalBitmap = outputBitmap
-
-                    // Make output Image visible
-                    binding.imageviewOutput.visibility = View.VISIBLE
-
-                }*/
-            }
-
-        }
 
     }
 

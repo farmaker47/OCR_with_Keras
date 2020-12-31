@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ocr_nav_graph"
+    app:startDestination="@id/ocr_fragment">
+
+    <fragment
+        android:id="@+id/ocr_fragment"
+        android:name="com.soloupis.sample.ocr_keras.fragments.ocr.OcrFragment"
+        android:label="Selfie2SegmentationFragment">
+    </fragment>
+
+</navigation>

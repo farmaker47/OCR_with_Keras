@@ -1,22 +1,14 @@
-package com.soloupis.sample.ocr_keras.fragments.segmentation
+package com.soloupis.sample.ocr_keras.fragments.ocr
 
 import android.content.Context
 import android.graphics.*
 import android.os.SystemClock
 import android.util.Log
-import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.support.common.ops.NormalizeOp
-import org.tensorflow.lite.support.image.ColorSpaceType
-import org.tensorflow.lite.support.image.ImageProcessor
-import org.tensorflow.lite.support.image.TensorImage
-import org.tensorflow.lite.support.image.ops.ResizeOp
-import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.nio.IntBuffer
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 
