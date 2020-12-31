@@ -9,7 +9,7 @@
     <fragment
         android:id="@+id/ocr_fragment"
         android:name="com.soloupis.sample.ocr_keras.fragments.ocr.OcrFragment"
-        android:label="Selfie2SegmentationFragment">
+        android:label="OcrFragment">
     </fragment>
 
 </navigation>
