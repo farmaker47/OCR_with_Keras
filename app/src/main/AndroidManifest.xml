@@ -2,13 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.soloupis.sample.ocr_keras">
 
-    <!-- Make sure there is at least one camera -->
-    <uses-feature android:name="android.hardware.camera.any" />
-    <!-- Ask for camera permission -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <application
         android:name="com.soloupis.sample.ocr_keras.OcrKerasApplication"
         android:allowBackup="true"

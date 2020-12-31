@@ -8,17 +8,14 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.soloupis.sample.ocr_keras.MainActivity
 import com.soloupis.sample.ocr_keras.R
 import com.soloupis.sample.ocr_keras.databinding.FragmentOcrFragmentBinding
-import com.soloupis.sample.ocr_keras.fragments.StyleFragment
 import com.soloupis.sample.ocr_keras.utils.ImageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,8 +36,7 @@ import java.util.*
  * This is where we show both the captured input image and the output image
  */
 class OcrFragment : Fragment(),
-        SearchFragmentNavigationAdapter.SearchClickItemListener,
-        StyleFragment.OnListFragmentInteractionListener {
+        SearchFragmentNavigationAdapter.SearchClickItemListener {
 
     private lateinit var filePath: String
     private var finalBitmap: Bitmap? = null
@@ -71,7 +67,6 @@ class OcrFragment : Fragment(),
 
     private var outputBitmapFinal: Bitmap? = null
     private var inferenceTime: Long = 0L
-    private val stylesFragment: StyleFragment = StyleFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -290,20 +285,5 @@ class OcrFragment : Fragment(),
         return Pair(outputArray, inferenceFullTime)
     }
 
-    override fun onListFragmentInteraction(item: String) {
-    }
 
-    fun methodToStartStyleTransfer(item: String) {
-
-        stylesFragment.dismiss()
-
-        scaledBitmap = Bitmap.createScaledBitmap(
-                selfieBitmap,
-                MODEL_WIDTH,
-                MODEL_HEIGHT, true
-        )
-
-        executeOcr(item)
-        getKoin().setProperty(getString(R.string.koinStyle), item)
-    }
 }
