@@ -28,13 +28,6 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-/**
- * A simple [Fragment] subclass.
- * Use the [OcrFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- * This is where we show both the captured input image and the output image
- */
 class OcrFragment : Fragment(),
     SearchFragmentNavigationAdapter.SearchClickItemListener {
 
