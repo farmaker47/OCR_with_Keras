@@ -102,7 +102,7 @@ class OcrFragment : Fragment(),
         // Observe ML kit inference time
         viewModel.inferenceTimeMlKit.observe(requireActivity(), Observer { time ->
 
-            Log.e("ML_Kit_time", time.toString())
+            Log.i("ML_Kit_time", time.toString())
 
         })
 
@@ -123,6 +123,7 @@ class OcrFragment : Fragment(),
 
         // Using Keras OCR
         executeOcr(imagePath)
+
         //getKoin().setProperty(getString(R.string.koinStyle), type)
         binding.imageviewOutput.setImageBitmap(
             getBitmapFromAsset(
@@ -149,7 +150,7 @@ class OcrFragment : Fragment(),
             withContext(Dispatchers.Main) {
                 outputArray = longArray
                 inferenceFullTime = inferenceTime
-                Log.e("RESULT_OCR", outputArray.contentToString())
+                Log.i("RESULT_OCR", outputArray.contentToString())
 
                 val sb: StringBuilder = StringBuilder()
                 for (i in outputArray.indices) {
