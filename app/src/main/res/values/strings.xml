@@ -11,5 +11,6 @@
     <string name="aboutSyleTransfer">Style Transfer procedure</string>
     <string name="keras_ocr_result">Keras OCR result:</string>
     <string name="ml_kit_result">ML kit result:</string>
+    <string name="comparing_ocr_models">Comparing OCR models</string>
 
 </resources>
