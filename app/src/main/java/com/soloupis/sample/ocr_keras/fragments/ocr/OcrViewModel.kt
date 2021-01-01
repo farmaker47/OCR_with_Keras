@@ -2,23 +2,28 @@ package com.soloupis.sample.ocr_keras.fragments.ocr
 
 import android.app.Application
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
 import org.koin.core.KoinComponent
 import org.koin.core.get
 import java.io.IOException
 
 class OcrViewModel(application: Application) :
-        AndroidViewModel(application),
-        KoinComponent {
+    AndroidViewModel(application),
+    KoinComponent {
 
     private lateinit var scaledMaskBitmap: Bitmap
     private lateinit var outputArray: LongArray
     var startTime: Long = 0L
+    var startTimeMlKit: Long = 0L
+
     var inferenceTime = 0L
 
     var seekBarProgress: Float = 0F
@@ -31,6 +36,10 @@ class OcrViewModel(application: Application) :
     val inferenceDone: LiveData<Boolean>
         get() = _inferenceDone
 
+    private val _inferenceTimeMlKit = MutableLiveData<Long>()
+    val inferenceTimeMlKit: LiveData<Long>
+        get() = _inferenceTimeMlKit
+
     val ocrModelExecutor: OcrModelExecutor
 
     init {
@@ -42,11 +51,11 @@ class OcrViewModel(application: Application) :
     }
 
     fun onClickPerformOcr(
-            context: Context,
-            imageFilePath: String
+        context: Context,
+        imageFilePath: String
     ): Pair<LongArray, Long> {
 
-        return performOcrWithImage(imageFilePath,context)
+        return performOcrWithImage(imageFilePath, context)
     }
 
     fun performOcrWithImage(thumbnailsImageName: String, context: Context): Pair<LongArray, Long> {
@@ -55,7 +64,12 @@ class OcrViewModel(application: Application) :
             startTime = SystemClock.uptimeMillis()
 
             // Run inference
-            val result = ocrModelExecutor.executeOcrWithInterpreter(getBitmapFromAsset(context,"thumbnails/$thumbnailsImageName"), context)
+            val result = ocrModelExecutor.executeOcrWithInterpreter(
+                getBitmapFromAsset(
+                    context,
+                    "thumbnails/$thumbnailsImageName"
+                ), context
+            )
             outputArray = result
 
             inferenceTime = SystemClock.uptimeMillis() - startTime
@@ -67,8 +81,39 @@ class OcrViewModel(application: Application) :
         return Pair(outputArray, inferenceTime)
     }
 
+    fun performOcrWithMlKit(thumbnailsImageName: String, context: Context) {
+
+        startTimeMlKit = System.currentTimeMillis()
+
+        val scaledBitmap = Bitmap.createScaledBitmap(
+            getBitmapFromAsset(
+                context,
+                "thumbnails/$thumbnailsImageName"
+            ),
+            200,
+            32,
+            true
+        )
+
+        val image = InputImage.fromBitmap(
+            scaledBitmap, 0
+        )
+        val recognizer = TextRecognition.getClient()
+        recognizer.process(image)
+            .addOnSuccessListener { texts ->
+                Log.e("ML_Kit", texts.text)
+
+                _inferenceTimeMlKit.value = System.currentTimeMillis() - startTimeMlKit
+            }
+            .addOnFailureListener { e -> // Task failed with an exception
+                e.printStackTrace()
+            }
+
+
+    }
+
     private fun getBitmapFromAsset(context: Context, path: String): Bitmap =
-            context.assets.open(path).use { BitmapFactory.decodeStream(it) }
+        context.assets.open(path).use { BitmapFactory.decodeStream(it) }
 
 
     override fun onCleared() {

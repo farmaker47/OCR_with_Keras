@@ -30,29 +30,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/textOcr"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/about"
-                    android:visibility="gone"
-                    android:textAlignment="center"
-                    android:textAppearance="@android:style/TextAppearance.Medium"
-                    android:textSize="22sp"
-                    app:layout_constraintBottom_toTopOf="@id/frame_output"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewImages"
+                    android:layout_width="match_parent"
+                    android:layout_height="90dp"
+                    android:layout_marginTop="32dp"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <FrameLayout
                     android:id="@+id/frame_output"
                     android:layout_width="244dp"
                     android:layout_height="100dp"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginTop="16dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/textOcr">
+                    app:layout_constraintTop_toBottomOf="@id/recyclerViewImages">
 
                     <ImageView
                         android:id="@+id/imageview_input"
@@ -77,13 +69,6 @@
                         android:visibility="visible" />
                 </FrameLayout>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerViewImages"
-                    android:layout_width="match_parent"
-                    android:layout_height="90dp"
-                    android:layout_marginTop="12dp"
-                    app:layout_constraintTop_toBottomOf="@id/frame_output" />
-
                 <TextView
                     android:id="@+id/headerKerasOcr"
                     android:layout_width="wrap_content"
@@ -96,7 +81,7 @@
                     android:textSize="28sp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/recyclerViewImages" />
+                    app:layout_constraintTop_toBottomOf="@id/frame_output" />
 
                 <TextView
                     android:id="@+id/textViewOcrResult"

@@ -91,4 +91,6 @@ dependencies {
     // Koin Android ViewModel features
     implementation "org.koin:koin-android-viewmodel:$koin_version"
 
+    // ML kit - Text Recognition
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:16.1.2'
 }
