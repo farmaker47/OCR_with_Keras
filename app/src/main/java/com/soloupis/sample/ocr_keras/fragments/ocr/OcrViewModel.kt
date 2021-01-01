@@ -40,6 +40,10 @@ class OcrViewModel(application: Application) :
     val inferenceTimeMlKit: LiveData<Long>
         get() = _inferenceTimeMlKit
 
+    private val _mlKitOcrText = MutableLiveData<String>()
+    val mlKitOcrtext: LiveData<String>
+        get() = _mlKitOcrText
+
     val ocrModelExecutor: OcrModelExecutor
 
     init {
@@ -47,6 +51,8 @@ class OcrViewModel(application: Application) :
         _currentList.addAll(application.assets.list("thumbnails")!!)
 
         ocrModelExecutor = get()
+
+        _inferenceTimeMlKit.value = 0L
 
     }
 
@@ -102,6 +108,8 @@ class OcrViewModel(application: Application) :
         recognizer.process(image)
             .addOnSuccessListener { texts ->
                 Log.e("ML_Kit", texts.text)
+
+                _mlKitOcrText.value = texts.text
 
                 _inferenceTimeMlKit.value = System.currentTimeMillis() - startTimeMlKit
             }

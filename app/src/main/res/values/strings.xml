@@ -9,6 +9,7 @@
     <string name="koinStyle">koinStyle</string>
     <string name="choose_a_style" translatable="false">Choose a Style</string>
     <string name="aboutSyleTransfer">Style Transfer procedure</string>
-    <string name="keras_ocr_result">Keras Ocr Result</string>
+    <string name="keras_ocr_result">Keras OCR result:</string>
+    <string name="ml_kit_result">ML kit result:</string>
 
 </resources>
