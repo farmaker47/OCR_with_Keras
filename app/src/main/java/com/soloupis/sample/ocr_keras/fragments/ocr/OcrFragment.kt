@@ -7,26 +7,16 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
-import com.soloupis.sample.ocr_keras.MainActivity
-import com.soloupis.sample.ocr_keras.R
 import com.soloupis.sample.ocr_keras.databinding.FragmentOcrFragmentBinding
-import com.soloupis.sample.ocr_keras.utils.ImageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.get
-import org.koin.android.ext.android.getKoin
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.tensorflow.lite.support.common.FileUtil
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 
 class OcrFragment : Fragment(),
     SearchFragmentNavigationAdapter.SearchClickItemListener {
@@ -86,9 +76,9 @@ class OcrFragment : Fragment(),
         viewModel.inferenceDone.observe(
             requireActivity(),
             Observer { loadingDone ->
-                when (loadingDone) {
+                /*when (loadingDone) {
                     //true -> binding.progressbarStyle.visibility = View.GONE
-                }
+                }*/
             }
         )
 
@@ -98,12 +88,6 @@ class OcrFragment : Fragment(),
             Log.i("ML_Kit_time", time.toString())
 
         })
-
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
 
     }
 

@@ -58,7 +58,7 @@ class SearchFragmentNavigationAdapter(
         }
     }
 
-    inner class NavigationAdapterViewHolder(var binding: SearchFragmentAdapterBinding) :
+    inner class NavigationAdapterViewHolder(private var binding: SearchFragmentAdapterBinding) :
             RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         override fun onClick(view: View) {
@@ -116,8 +116,5 @@ class SearchFragmentNavigationAdapter(
     private fun getBitmapFromAsset(context: Context, path: String): Bitmap =
             context.assets.open(path).use { BitmapFactory.decodeStream(it) }
 
-    companion object {
-
-    }
 
 }

@@ -19,14 +19,11 @@ class OcrViewModel(application: Application) :
     AndroidViewModel(application),
     KoinComponent {
 
-    private lateinit var scaledMaskBitmap: Bitmap
     private lateinit var outputArray: LongArray
-    var startTime: Long = 0L
-    var startTimeMlKit: Long = 0L
+    private var startTime: Long = 0L
+    private var startTimeMlKit: Long = 0L
 
-    var inferenceTime = 0L
-
-    var seekBarProgress: Float = 0F
+    private var inferenceTime = 0L
 
     private var _currentList: ArrayList<String> = ArrayList()
     val currentList: ArrayList<String>
@@ -44,7 +41,7 @@ class OcrViewModel(application: Application) :
     val mlKitOcrtext: LiveData<String>
         get() = _mlKitOcrText
 
-    val ocrModelExecutor: OcrModelExecutor
+    private val ocrModelExecutor: OcrModelExecutor
 
     init {
 
@@ -64,7 +61,7 @@ class OcrViewModel(application: Application) :
         return performOcrWithImage(imageFilePath, context)
     }
 
-    fun performOcrWithImage(thumbnailsImageName: String, context: Context): Pair<LongArray, Long> {
+    private fun performOcrWithImage(thumbnailsImageName: String, context: Context): Pair<LongArray, Long> {
         try {
             // Initialization
             startTime = SystemClock.uptimeMillis()

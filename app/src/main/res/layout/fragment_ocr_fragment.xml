@@ -21,7 +21,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="84dp"
-            android:background="#fff"
             android:paddingStart="8dp"
             android:paddingEnd="8dp">
 

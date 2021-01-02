@@ -12,16 +12,6 @@ import java.nio.ByteOrder
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 
-
-data class ModelExecutionResult(
-    val intArray: Bitmap,
-    val preProcessTime: Long = 0L,
-    val postProcessTime: Long = 0L,
-    val totalExecutionTime: Long = 0L,
-    val executionLog: String = "",
-    val errorMessage: String = ""
-)
-
 @SuppressWarnings("GoodTime")
 class OcrModelExecutor(
     context: Context,
@@ -30,8 +20,6 @@ class OcrModelExecutor(
 
     private var numberThreads = 7
     private var fullExecutionTime = 0L
-    private var preProcessTime = 0L
-    private var postProcessTime = 0L
     private val interpreterPredict: Interpreter
 
     init {
@@ -91,7 +79,8 @@ class OcrModelExecutor(
         )
         val width = bitmap.width
         val height = bitmap.height
-        val mImgData: ByteBuffer = ByteBuffer.allocateDirect(4 * width * height)
+        // Below 4 is for floats and 2nd one (1) for grayscale
+        val mImgData: ByteBuffer = ByteBuffer.allocateDirect(1 * width * height * 1 * 4)
         mImgData.order(ByteOrder.nativeOrder())
         val pixels = IntArray(width * height)
         bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
@@ -131,10 +120,8 @@ class OcrModelExecutor(
     }
 
     fun androidGrayScale(bmpOriginal: Bitmap): Bitmap {
-        val width: Int
-        val height: Int
-        height = bmpOriginal.height
-        width = bmpOriginal.width
+        val height: Int = bmpOriginal.height
+        val width: Int = bmpOriginal.width
         val bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bmpGrayscale)
         val paint = Paint()

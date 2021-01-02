@@ -124,7 +124,7 @@ abstract class ImageUtils {
             )
         }
 
-        fun scaleBitmapAndKeepRatio(
+        private fun scaleBitmapAndKeepRatio(
             targetBmp: Bitmap,
             reqHeightInPixels: Int,
             reqWidthInPixels: Int
