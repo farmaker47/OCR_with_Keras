@@ -101,13 +101,15 @@ class OcrViewModel(application: Application) :
             true
         )
 
+        // Use grayscale bitmap as Keras OCR
         val image = InputImage.fromBitmap(
-            scaledBitmap, 0
+            ocrModelExecutor.androidGrayScale(scaledBitmap), 0
         )
+
         val recognizer = TextRecognition.getClient()
         recognizer.process(image)
             .addOnSuccessListener { texts ->
-                Log.e("ML_Kit", texts.text)
+                Log.i("ML_Kit", texts.text)
 
                 _mlKitOcrText.value = texts.text
 

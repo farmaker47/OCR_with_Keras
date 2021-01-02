@@ -100,6 +100,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center_horizontal"
+                    android:text="@string/inference_time_0ms"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textViewOcrResult" />
@@ -131,10 +132,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:text="@{viewModelXml.mlKitOcrtext}"
                     android:textAlignment="center"
                     android:textAppearance="@android:style/TextAppearance.Large"
                     android:textSize="28sp"
-                    android:text="@{viewModelXml.mlKitOcrtext}"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/headerKerasOcrML" />
@@ -144,8 +145,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="@{`Inference time: ` + viewModelXml.inferenceTimeMlKit + `ms`}"
                     android:gravity="center_horizontal"
+                    android:text="@{`Inference time: ` + viewModelXml.inferenceTimeMlKit + `ms`}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textViewOcrResultML" />

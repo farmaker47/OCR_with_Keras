@@ -130,7 +130,7 @@ class OcrModelExecutor(
         return retFile
     }
 
-    private fun androidGrayScale(bmpOriginal: Bitmap): Bitmap {
+    fun androidGrayScale(bmpOriginal: Bitmap): Bitmap {
         val width: Int
         val height: Int
         height = bmpOriginal.height
