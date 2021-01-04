@@ -55,6 +55,7 @@ class OcrFragment : Fragment(),
                 viewModel.currentList,
                 this
             )
+
         binding.recyclerViewImages.apply {
             setHasFixedSize(true)
             layoutManager =
