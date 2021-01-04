@@ -11,6 +11,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.TextRecognizer
 import org.koin.core.KoinComponent
 import org.koin.core.get
 import java.io.IOException
@@ -42,12 +43,14 @@ class OcrViewModel(application: Application) :
         get() = _mlKitOcrText
 
     private val ocrModelExecutor: OcrModelExecutor
+    private val recognizer:TextRecognizer
 
     init {
 
         _currentList.addAll(application.assets.list("thumbnails")!!)
 
         ocrModelExecutor = get()
+        recognizer = TextRecognition.getClient()
 
         _inferenceTimeMlKit.value = 0L
 
@@ -103,7 +106,6 @@ class OcrViewModel(application: Application) :
             ocrModelExecutor.androidGrayScale(scaledBitmap), 0
         )
 
-        val recognizer = TextRecognition.getClient()
         recognizer.process(image)
             .addOnSuccessListener { texts ->
                 Log.i("ML_Kit", texts.text)
