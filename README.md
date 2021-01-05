@@ -7,6 +7,8 @@ towards audio signal processing and text recognition.
 
 <img src="CRNN.png" width="2560" height="240">
 
+In our example model consists of Conv2D layers and unidirectional LSTM layers.
+
 
 
 
