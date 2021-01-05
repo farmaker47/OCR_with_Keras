@@ -5,7 +5,7 @@ The CRNNs are the combination of two of the most prominent neural networks. They
 by the RNN(Recurrent neural networks). The proposed network is similar to the CRNN but generates better or optimal results especially
 towards audio signal processing and text recognition.
 
-<img src="CRNN.png" width="2560" height="540">
+<img src="CRNN.png" width="2560" height="240">
 
 
 
