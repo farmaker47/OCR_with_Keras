@@ -16,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.viewmodel.ext.android.viewModel
-import org.tensorflow.lite.support.common.FileUtil
+//import org.tensorflow.lite.support.common.FileUtil
 
 class OcrFragment : Fragment(),
     SearchFragmentNavigationAdapter.SearchClickItemListener {
@@ -66,7 +66,8 @@ class OcrFragment : Fragment(),
 
         observeViewModel()
 
-        labels = FileUtil.loadLabels(requireActivity(), "alphabets.txt")
+        labels = listOf<Any>(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z") as List<String>//FileUtil.loadLabels(requireActivity(), "alphabets.txt")
+        Log.i("LABELS", labels.toString())
 
         return binding.root
     }

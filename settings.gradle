@@ -1,2 +1,4 @@
+include ':tensorflow-lite-ops'
+include ':tensorflow-lite-main'
 rootProject.name='ocr_keras'
 include ':app'

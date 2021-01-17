@@ -67,10 +67,10 @@ dependencies {
 
     // TensorFlow Lite dependencies
     def tfl_version = "0.0.0-nightly"
-    implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0-rc2'
-    implementation("org.tensorflow:tensorflow-lite:${tfl_version}") { changing = true }
-    implementation("org.tensorflow:tensorflow-lite-gpu:${tfl_version}") { changing = true }
-    implementation 'org.tensorflow:tensorflow-lite-support:0.0.0-nightly'
+    //implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0-rc2'
+    //implementation("org.tensorflow:tensorflow-lite:${tfl_version}") { changing = true }
+    //implementation("org.tensorflow:tensorflow-lite-gpu:${tfl_version}") { changing = true }
+    //implementation 'org.tensorflow:tensorflow-lite-support:0.0.0-nightly'
     implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:0.0.0-nightly'
 
     // Glide
@@ -93,4 +93,10 @@ dependencies {
 
     // ML kit - Text Recognition
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:16.1.2'
+
+    // Use custom .aar files in libs folder
+    implementation project(':tensorflow-lite-main')
+    //implementation project(':tensorflow-lite-ops')
+    //implementation files('libs/tensorflow-lite-main.aar')
+    //implementation files('libs/tensorflow-lite-ops.aar')
 }
