@@ -48,6 +48,8 @@ class OcrModelExecutor(
             fullExecutionTime = SystemClock.uptimeMillis()
 
             val arrayOutputs = Array(1) { LongArray(48) { 0 } }
+            /*val probabilityBuffer: TensorBuffer =
+                TensorBuffer.createFixedSize(intArrayOf(1, 48), DataType.INT64)*/
 
             interpreterPredict.run(
                 getByteBufferNormalized(androidGrayScale(contentImage)), arrayOutputs
