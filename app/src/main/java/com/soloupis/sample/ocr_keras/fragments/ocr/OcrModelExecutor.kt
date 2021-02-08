@@ -1,16 +1,25 @@
 package com.soloupis.sample.ocr_keras.fragments.ocr
 
+import android.R.attr.bitmap
 import android.content.Context
 import android.graphics.*
 import android.os.SystemClock
 import android.util.Log
+import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.support.common.ops.NormalizeOp
+import org.tensorflow.lite.support.image.ImageProcessor
+import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.support.image.ops.ResizeOp
+import org.tensorflow.lite.support.image.ops.TransformToGrayscale
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
+
 
 @SuppressWarnings("GoodTime")
 class OcrModelExecutor(
@@ -48,11 +57,20 @@ class OcrModelExecutor(
             fullExecutionTime = SystemClock.uptimeMillis()
 
             val arrayOutputs = Array(1) { LongArray(48) { 0 } }
-            /*val probabilityBuffer: TensorBuffer =
-                TensorBuffer.createFixedSize(intArrayOf(1, 48), DataType.INT64)*/
+
+            val imageProcessor = ImageProcessor.Builder()
+                .add(ResizeOp(31, 200, ResizeOp.ResizeMethod.BILINEAR))
+                .add(TransformToGrayscale())
+                .build()
+
+            var tImage = TensorImage(DataType.FLOAT32)
+
+            // Preprocess the image
+            tImage.load(contentImage)
+            tImage = imageProcessor.process(tImage)
 
             interpreterPredict.run(
-                getByteBufferNormalized(androidGrayScale(contentImage)), arrayOutputs
+                tImage.bufferFromOneChannel, arrayOutputs
             )
 
             Log.i(TAG, "after running")
