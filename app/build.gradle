@@ -111,7 +111,7 @@ allprojects {
 }
 
 dependencies {
-    implementation(name:'tensorflow-lite-2.4.0', ext:'aar')
-    implementation(name:'tensorflow-lite-ops', ext:'aar')
-    implementation(name:'tensorflow-lite-support-0.1.4', ext:'aar')
+    implementation(name:'tensorflow-lite-custom', ext:'aar')
+    implementation(name:'tensorflow-lite-ops-custom', ext:'aar')
+    implementation(name:'tensorflow-lite-support-0.1.2', ext:'aar')
 }
