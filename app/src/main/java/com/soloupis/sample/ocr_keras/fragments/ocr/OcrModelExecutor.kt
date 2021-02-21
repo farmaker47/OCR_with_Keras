@@ -125,9 +125,20 @@ class OcrModelExecutor(
         val bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bmpGrayscale)
         val paint = Paint()
-        val colorMatrix = ColorMatrix()
+        /*val colorMatrix = ColorMatrix()
         colorMatrix.setSaturation(0f)
-        val colorMatrixFilter = ColorMatrixColorFilter(colorMatrix)
+        val colorMatrixFilter = ColorMatrixColorFilter(colorMatrix)*/
+
+        // Based on OpenCv Conversion to Grayscale
+        // https://docs.opencv.org/master/de/d25/imgproc_color_conversions.html#color_convert_rgb_gray
+        // and info from
+        // https://medium.com/mobile-app-development-publication/android-image-color-change-with-colormatrix-e927d7fb6eb4
+        val matrix = floatArrayOf(
+            0.299f, 0.587f, 0.114f, 0f, 0f,
+            0.299f, 0.587f, 0.114f, 0f, 0f,
+            0.299f, 0.587f, 0.114f, 0f, 0f,
+            0f, 0f, 0f, 1f, 0f)
+        val colorMatrixFilter = ColorMatrixColorFilter(matrix)
         paint.colorFilter = colorMatrixFilter
         canvas.drawBitmap(bmpOriginal, 0f, 0f, paint)
         return bmpGrayscale
