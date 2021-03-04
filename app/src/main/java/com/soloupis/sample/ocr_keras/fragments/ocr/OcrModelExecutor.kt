@@ -61,6 +61,7 @@ class OcrModelExecutor(
             val imageProcessor = ImageProcessor.Builder()
                 .add(ResizeOp(31, 200, ResizeOp.ResizeMethod.BILINEAR))
                 .add(TransformToGrayscale())
+                .add(NormalizeOp(0.0F, 255.0F))
                 .build()
 
             var tImage = TensorImage(DataType.FLOAT32)
@@ -70,7 +71,7 @@ class OcrModelExecutor(
             tImage = imageProcessor.process(tImage)
 
             interpreterPredict.run(
-                tImage.bufferFromOneChannel, arrayOutputs
+                tImage.buffer, arrayOutputs
             )
 
             Log.i(TAG, "after running")
