@@ -11,8 +11,7 @@ import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
-import org.tensorflow.lite.support.image.ops.TransformToGrayscale
-import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import org.tensorflow.lite.support.image.ops.TransformToGrayscaleOp
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -60,7 +59,7 @@ class OcrModelExecutor(
 
             val imageProcessor = ImageProcessor.Builder()
                 .add(ResizeOp(31, 200, ResizeOp.ResizeMethod.BILINEAR))
-                .add(TransformToGrayscale())
+                .add(TransformToGrayscaleOp())
                 .add(NormalizeOp(0.0F, 255.0F))
                 .build()
 
