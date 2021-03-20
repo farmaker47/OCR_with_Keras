@@ -113,5 +113,5 @@ allprojects {
 dependencies {
     implementation(name:'tensorflow-lite-custom', ext:'aar')
     implementation(name:'tensorflow-lite-ops-custom', ext:'aar')
-    implementation(name:'tensorflowlite_support_final_with_doc', ext:'aar')
+    implementation(name:'tensorflowlite_support_rgb_check', ext:'aar')
 }
