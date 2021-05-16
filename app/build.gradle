@@ -93,10 +93,11 @@ dependencies {
     // TensorFlow Lite dependencies
     def tfl_version = "0.0.0-nightly"
     //implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0-rc7'
-    //implementation("org.tensorflow:tensorflow-lite:${tfl_version}") { changing = true }
+    implementation("org.tensorflow:tensorflow-lite:${tfl_version}") { changing = true }
     //implementation("org.tensorflow:tensorflow-lite-gpu:${tfl_version}") { changing = true }
+    implementation("org.tensorflow:tensorflow-lite-support:0.2.0-rc2")
     //implementation 'org.tensorflow:tensorflow-lite-support:0.1.0-rc7'
-    //implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:0.0.0-nightly'
+    implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:0.0.0-nightly'
 
 }
 
@@ -111,7 +112,7 @@ allprojects {
 }
 
 dependencies {
-    implementation(name:'tensorflow-lite-custom', ext:'aar')
-    implementation(name:'tensorflow-lite-ops-custom', ext:'aar')
-    implementation(name:'tensorflowlite_support_rgb_check', ext:'aar')
+    //implementation(name:'tensorflow-lite-custom', ext:'aar')
+    //implementation(name:'tensorflow-lite-ops-custom', ext:'aar')
+    //implementation(name:'tensorflowlite_support_google', ext:'aar')
 }
