@@ -1,11 +1,9 @@
 package com.soloupis.sample.ocr_keras.fragments.ocr
 
-import android.R.attr.bitmap
 import android.content.Context
 import android.graphics.*
 import android.os.SystemClock
 import android.util.Log
-import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
@@ -55,23 +53,38 @@ class OcrModelExecutor(
 
             fullExecutionTime = SystemClock.uptimeMillis()
 
+            // Info of the model
+            val inputType = interpreterPredict.getInputTensor(0).dataType()
+            val inputName = interpreterPredict.getInputTensor(0).name()
+            val inputShape = interpreterPredict.getInputTensor(0).shape()
+
+            val outputName = interpreterPredict.getOutputTensor(0).name()
             val arrayOutputs = Array(1) { LongArray(48) { 0 } }
 
+            val signatures = interpreterPredict.signatureDefNames
+
+            // ImageProcessor
             val imageProcessor = ImageProcessor.Builder()
-                .add(ResizeOp(31, 200, ResizeOp.ResizeMethod.BILINEAR))
+                .add(ResizeOp(inputShape[1], inputShape[2], ResizeOp.ResizeMethod.BILINEAR))
                 .add(TransformToGrayscaleOp())
                 .add(NormalizeOp(0.0F, 255.0F))
                 .build()
 
-            var tImage = TensorImage(DataType.FLOAT32)
+            var tImage = TensorImage(inputType)
 
             // Preprocess the image
             tImage.load(contentImage)
             tImage = imageProcessor.process(tImage)
 
-            interpreterPredict.run(
-                tImage.buffer, arrayOutputs
+            val inputs: MutableMap<String, Any> = HashMap()
+            inputs[inputName] = tImage.buffer
+            val outputs: MutableMap<String, Any> = HashMap()
+            outputs[outputName] = arrayOutputs
+
+            interpreterPredict.runSignature(
+                inputs, outputs, signatures[0]
             )
+            //interpreterPredict.run(tImage.buffer, arrayOutputs)
 
             Log.i(TAG, "after running")
 

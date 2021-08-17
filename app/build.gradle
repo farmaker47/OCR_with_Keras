@@ -6,7 +6,7 @@ apply plugin: "androidx.navigation.safeargs"
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "29.0.3"
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.soloupis.ocr_keras"
@@ -65,17 +65,16 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     // Navigation library
-    implementation "androidx.navigation:navigation-fragment-ktx:2.3.2"
-    implementation "androidx.navigation:navigation-ui-ktx:2.3.2"
-    implementation "android.arch.navigation:navigation-fragment-ktx:1.0.0"
+    implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
+    implementation "androidx.navigation:navigation-ui-ktx:2.3.5"
 
     // Glide
-    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
 
     // Kotlin Coroutine
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.7'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
 
     // Koin for Kotlin
     def koin_version = "2.1.5"
@@ -88,16 +87,18 @@ dependencies {
     implementation "org.koin:koin-android-viewmodel:$koin_version"
 
     // ML kit - Text Recognition
-    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:16.1.2'
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:16.3.0'
 
     // TensorFlow Lite dependencies
     def tfl_version = "0.0.0-nightly"
     //implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0-rc7'
-    implementation("org.tensorflow:tensorflow-lite:${tfl_version}") { changing = true }
+    //implementation("org.tensorflow:tensorflow-lite:${tfl_version}") { changing = true }
+    //implementation 'org.tensorflow:tensorflow-lite:2.5.0'
+    implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly-SNAPSHOT'
     //implementation("org.tensorflow:tensorflow-lite-gpu:${tfl_version}") { changing = true }
-    implementation("org.tensorflow:tensorflow-lite-support:0.2.0-rc2")
+    //implementation("org.tensorflow:tensorflow-lite-support:0.2.0-rc2")
     //implementation 'org.tensorflow:tensorflow-lite-support:0.1.0-rc7'
-    implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:0.0.0-nightly'
+    //implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:0.0.0-nightly'
 
 }
 
@@ -112,7 +113,8 @@ allprojects {
 }
 
 dependencies {
+    implementation(name:'task-library-vision', ext:'aar')
     //implementation(name:'tensorflow-lite-custom', ext:'aar')
-    //implementation(name:'tensorflow-lite-ops-custom', ext:'aar')
-    //implementation(name:'tensorflowlite_support_google', ext:'aar')
+    implementation(name:'tensorflow-lite-ops-custom', ext:'aar')
+    implementation(name:'tensorflowlite_support_colab', ext:'aar')
 }
