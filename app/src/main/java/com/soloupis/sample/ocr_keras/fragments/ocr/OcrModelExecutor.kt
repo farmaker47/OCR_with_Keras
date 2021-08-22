@@ -77,9 +77,9 @@ class OcrModelExecutor(
             tImage = imageProcessor.process(tImage)
 
             val inputs: MutableMap<String, Any> = HashMap()
-            inputs[inputName] = tImage.buffer
+            inputs["input"] = tImage.buffer
             val outputs: MutableMap<String, Any> = HashMap()
-            outputs[outputName] = arrayOutputs
+            outputs["decode"] = arrayOutputs
 
             interpreterPredict.runSignature(
                 inputs, outputs, signatures[0]
